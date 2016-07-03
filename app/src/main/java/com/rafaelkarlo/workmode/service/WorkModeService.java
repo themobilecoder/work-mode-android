@@ -6,17 +6,17 @@ public class WorkModeService {
 
     private AudioManager audioManager;
 
+    public WorkModeService(AudioManager audioManager) {
+        this.audioManager = audioManager;
+    }
+
     public boolean activateWorkMode() {
         audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        return true;
+        return audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT;
     }
 
     public boolean deactivateWorkMode() {
         audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        return true;
-    }
-
-    public void setAudioManager(AudioManager audioManager) {
-        this.audioManager = audioManager;
+        return audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
     }
 }

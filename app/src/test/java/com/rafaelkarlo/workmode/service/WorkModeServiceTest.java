@@ -1,6 +1,7 @@
 package com.rafaelkarlo.workmode.service;
 
 
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 
 import org.junit.Before;
@@ -23,45 +24,83 @@ public class WorkModeServiceTest {
     @Mock
     AudioManager audioManager;
 
+    @Mock
+    SharedPreferences sharedPreferences;
+
+    @Mock
+    SharedPreferences.Editor sharedPreferencesEditor;
+
     @Before
     public void setup() {
-        workModeService = new WorkModeService(audioManager);
+        workModeService = new WorkModeService(audioManager, sharedPreferences);
     }
 
     @Test
-    public void shouldSetToWorkMode() {
+    public void shouldSetToSilentMode() {
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
 
-        assertThat(workModeService.activateWorkMode()).isTrue();
+        assertThat(workModeService.setToSilentMode()).isTrue();
 
         verify(audioManager).setRingerMode(RINGER_MODE_SILENT);
     }
 
     @Test
-    public void shouldDisableWorkMode() {
+    public void shouldSetToNormalMode() {
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_NORMAL);
 
-        assertThat(workModeService.deactivateWorkMode()).isTrue();
+        assertThat(workModeService.setToNormalMode()).isTrue();
 
         verify(audioManager).setRingerMode(RINGER_MODE_NORMAL);
     }
 
     @Test
-    public void shouldReturnFalseIfWorkModeHasNotBeenSetSuccessfully() {
+    public void shouldReturnFalseIfSilentModeHasNotBeenSetSuccessfully() {
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_NORMAL);
 
-        assertThat(workModeService.activateWorkMode()).isFalse();
+        assertThat(workModeService.setToSilentMode()).isFalse();
 
         verify(audioManager).setRingerMode(RINGER_MODE_SILENT);
     }
 
     @Test
-    public void shouldReturnFalseIfDeactivateWorkModeHasNotBeenSetSuccessfully() {
+    public void shouldReturnFalseIfNormalModeHasNotBeenSetSuccessfully() {
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
 
-        assertThat(workModeService.deactivateWorkMode()).isFalse();
+        assertThat(workModeService.setToNormalMode()).isFalse();
 
         verify(audioManager).setRingerMode(RINGER_MODE_NORMAL);
+    }
+
+    @Test
+    public void shouldPersistWhenWorkModeIsActivated() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("WORK_MODE_ACTIVATED", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferences.getBoolean("WORK_MODE_ACTIVATED", false)).thenReturn(true);
+
+        workModeService.activate();
+        assertThat(workModeService.isActivated()).isTrue();
+
+        verify(sharedPreferences).edit();
+        verify(sharedPreferencesEditor).putBoolean("WORK_MODE_ACTIVATED", true);
+        verify(sharedPreferencesEditor).apply();
+
+        verify(sharedPreferences).getBoolean("WORK_MODE_ACTIVATED", false);
+    }
+
+    @Test
+    public void shouldPersistWhenWorkModeIsDeactivated() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("WORK_MODE_ACTIVATED", false)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferences.getBoolean("WORK_MODE_ACTIVATED", false)).thenReturn(false);
+
+        workModeService.deactivate();
+        assertThat(workModeService.isActivated()).isFalse();
+
+        verify(sharedPreferences).edit();
+        verify(sharedPreferencesEditor).putBoolean("WORK_MODE_ACTIVATED", false);
+        verify(sharedPreferencesEditor).apply();
+
+        verify(sharedPreferences).getBoolean("WORK_MODE_ACTIVATED", false);
     }
 
 }

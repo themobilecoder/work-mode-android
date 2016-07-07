@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Work Mode</string>
+    <string name="activate_string">Activate</string>
+    <string name="inactive">Inactive</string>
 </resources>

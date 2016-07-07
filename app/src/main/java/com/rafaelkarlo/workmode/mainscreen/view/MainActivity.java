@@ -1,4 +1,4 @@
-package com.rafaelkarlo.workmode;
+package com.rafaelkarlo.workmode.mainscreen.view;
 
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -6,7 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.TextView;
 
-import com.rafaelkarlo.workmode.service.WorkModeService;
+import com.rafaelkarlo.workmode.MainApplication;
+import com.rafaelkarlo.workmode.R;
+import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
 
 import javax.inject.Inject;
 
@@ -14,13 +16,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 
-public class MainScreen extends AppCompatActivity {
-
-    @Inject
-    WorkModeService workModeService;
+public class MainActivity extends AppCompatActivity implements MainView {
 
     @Inject
     AudioManager audioManager;
+
+    @Inject
+    MainPresenterImpl mainPresenter;
 
     @BindView(R.id.switchButton)
     SwitchCompat switchButton;
@@ -33,26 +35,30 @@ public class MainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
         injectDependencies();
-        checkActivationStatus();
+
+        mainPresenter.attachView(this);
+        mainPresenter.onCreate();
     }
 
     @OnCheckedChanged(R.id.switchButton)
     public void whenSwitchHasChanged(SwitchCompat switchButton) {
-        if (switchButton.isChecked()) {
-            workModeService.activate();
-            setViewToActivated();
-        } else {
-            workModeService.deactivate();
-            setViewToDeactivated();
+        if (switchButton.isShown()) {
+            if (switchButton.isChecked()) {
+                mainPresenter.activateWorkMode();
+            } else {
+                mainPresenter.deactivateWorkMode();
+            }
         }
     }
 
-    private void checkActivationStatus() {
-        if (workModeService.isActivated()) {
-            setViewToActivated();
-        } else {
-            setViewToDeactivated();
-        }
+    @Override
+    public void onWorkModeActivation() {
+        setViewToActivated();
+    }
+
+    @Override
+    public void onWorkModeDeactivation() {
+        setViewToDeactivated();
     }
 
     private void setViewToDeactivated() {
@@ -68,8 +74,7 @@ public class MainScreen extends AppCompatActivity {
     }
 
     private void injectDependencies() {
-        ((MainApplication) getApplication()).getMainScreenComponent().inject(this);
+        ((MainApplication) getApplication()).getMainActivityComponent().inject(this);
         ButterKnife.bind(this);
     }
-
 }

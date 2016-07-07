@@ -2,23 +2,23 @@ package com.rafaelkarlo.workmode;
 
 import android.app.Application;
 
-import com.rafaelkarlo.workmode.config.DaggerMainScreenComponent;
-import com.rafaelkarlo.workmode.config.MainScreenComponent;
-import com.rafaelkarlo.workmode.config.MainScreenModule;
+import com.rafaelkarlo.workmode.mainscreen.config.DaggerMainActivityComponent;
+import com.rafaelkarlo.workmode.mainscreen.config.MainActivityComponent;
+import com.rafaelkarlo.workmode.mainscreen.config.MainActivityModule;
 
 public class MainApplication extends Application {
 
-    MainScreenComponent mainScreenComponent;
+    MainActivityComponent mainActivityComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mainScreenComponent = DaggerMainScreenComponent.builder()
-                .mainScreenModule(new MainScreenModule(this))
+        mainActivityComponent = DaggerMainActivityComponent.builder()
+                .mainActivityModule(new MainActivityModule(this))
                 .build();
     }
 
-    public MainScreenComponent getMainScreenComponent() {
-        return mainScreenComponent;
+    public MainActivityComponent getMainActivityComponent() {
+        return mainActivityComponent;
     }
 }

@@ -1,4 +1,4 @@
-package com.rafaelkarlo.workmode.service;
+package com.rafaelkarlo.workmode.mainscreen.service;
 
 import android.content.SharedPreferences;
 import android.media.AudioManager;

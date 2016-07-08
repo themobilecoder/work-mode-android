@@ -3,6 +3,8 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
+import org.joda.time.DateTime;
+
 import static org.joda.time.DateTime.now;
 
 public class WorkModeService {
@@ -18,7 +20,7 @@ public class WorkModeService {
     }
 
     public boolean setToSilentMode() {
-        if (nowIsOutsideWorkHours()) {
+        if (nowIsWithinWorkHours()) {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             return true;
         } else {
@@ -47,10 +49,12 @@ public class WorkModeService {
         return sharedPreferences.getBoolean(WORK_MODE_ACTIVATED, false);
     }
 
-    private boolean nowIsOutsideWorkHours() {
+    private boolean nowIsWithinWorkHours() {
         int startTimeInSecondsOfDay = sharedPreferences.getInt("WORK_START_TIME", 0);
         int endTimeInSecondsOfDay = sharedPreferences.getInt("WORK_END_TIME", 0);
-        return startTimeInSecondsOfDay <= now().getSecondOfDay() && endTimeInSecondsOfDay >= now().getSecondOfDay();
+        DateTime now = now();
+
+        return startTimeInSecondsOfDay <= now.getSecondOfDay() && now.getSecondOfDay() <= endTimeInSecondsOfDay;
     }
 
     private boolean nowIsAfterWorkHours() {
@@ -67,6 +71,6 @@ public class WorkModeService {
     }
 
     private void saveInSharedPreferences(boolean activated) {
-        sharedPreferences.edit().putBoolean("WORK_MODE_ACTIVATED", activated).apply();
+        sharedPreferences.edit().putBoolean(WORK_MODE_ACTIVATED, activated).apply();
     }
 }

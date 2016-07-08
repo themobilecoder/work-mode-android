@@ -4,6 +4,7 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
+import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,12 +14,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static com.google.common.truth.Truth.assertThat;
+import static org.joda.time.DateTimeUtils.setCurrentMillisFixed;
+import static org.joda.time.DateTimeUtils.setCurrentMillisSystem;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkModeServiceTest {
 
+    public static final LocalDateTime START_WORK_TIME = new LocalDateTime(2016, 7, 28, 9, 0, 0);
+    private static final LocalDateTime END_WORK_TIME = new LocalDateTime(2016, 7, 28, 17, 0, 0);
     private WorkModeService workModeService;
 
     @Mock
@@ -33,11 +39,15 @@ public class WorkModeServiceTest {
     @Before
     public void setup() {
         workModeService = new WorkModeService(audioManager, sharedPreferences);
+        resetToPresent();
     }
 
     @Test
     public void shouldSetToSilentMode() {
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
+        when(sharedPreferences.getInt("WORK_START_TIME", 0)).thenReturn((START_WORK_TIME.toDateTime().getSecondOfDay()));
+
+        setCurrentTime(START_WORK_TIME);
 
         assertThat(workModeService.setToSilentMode()).isTrue();
 
@@ -45,8 +55,31 @@ public class WorkModeServiceTest {
     }
 
     @Test
-    public void shouldSetToNormalMode() {
+    public void shouldNotSetToSilentModeWhenBeforeWorkHours() {
+        when(sharedPreferences.getInt("WORK_START_TIME", 0)).thenReturn((START_WORK_TIME.toDateTime().getSecondOfDay()));
+
+        setCurrentTime(START_WORK_TIME.minusMinutes(1));
+
+        assertThat(workModeService.setToSilentMode()).isFalse();
+        verifyZeroInteractions(audioManager);
+    }
+
+    @Test
+    public void shouldNotSetToSilentModeAfterWorkHours() {
+        when(sharedPreferences.getInt("END_START_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
+
+        setCurrentTime(END_WORK_TIME.plusMinutes(1));
+
+        assertThat(workModeService.setToSilentMode()).isFalse();
+        verifyZeroInteractions(audioManager);
+    }
+
+    @Test
+    public void shouldSetToNormalModeAfterWorkHours() {
+        when(sharedPreferences.getInt("WORK_END_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_NORMAL);
+
+        setCurrentTime(END_WORK_TIME.plusMinutes(1));
 
         assertThat(workModeService.setToNormalMode()).isTrue();
 
@@ -54,21 +87,14 @@ public class WorkModeServiceTest {
     }
 
     @Test
-    public void shouldReturnFalseIfSilentModeHasNotBeenSetSuccessfully() {
-        when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_NORMAL);
+    public void shouldNotSetToNormalModeBeforeEndOfWorkHours() {
+        when(sharedPreferences.getInt("WORK_END_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
 
-        assertThat(workModeService.setToSilentMode()).isFalse();
-
-        verify(audioManager).setRingerMode(RINGER_MODE_SILENT);
-    }
-
-    @Test
-    public void shouldReturnFalseIfNormalModeHasNotBeenSetSuccessfully() {
-        when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
+        setCurrentTime(END_WORK_TIME.minusMinutes(1));
 
         assertThat(workModeService.setToNormalMode()).isFalse();
 
-        verify(audioManager).setRingerMode(RINGER_MODE_NORMAL);
+        verifyZeroInteractions(audioManager);
     }
 
     @Test
@@ -101,6 +127,15 @@ public class WorkModeServiceTest {
         verify(sharedPreferencesEditor).apply();
 
         verify(sharedPreferences).getBoolean("WORK_MODE_ACTIVATED", false);
+    }
+
+
+    private static void setCurrentTime(LocalDateTime localDateTime) {
+        setCurrentMillisFixed(localDateTime.toDate().getTime());
+    }
+
+    private static void resetToPresent() {
+        setCurrentMillisSystem();
     }
 
 }

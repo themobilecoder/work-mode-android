@@ -4,7 +4,7 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,8 +23,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class WorkModeServiceTest {
 
-    public static final LocalDateTime START_WORK_TIME = new LocalDateTime(2016, 7, 28, 9, 0, 0);
-    private static final LocalDateTime END_WORK_TIME = new LocalDateTime(2016, 7, 28, 17, 0, 0);
+    public static final LocalTime START_WORK_TIME = new LocalTime(9, 0, 0);
+    private static final LocalTime END_WORK_TIME = new LocalTime(17, 0, 0);
     public static final String WORK_MODE_ACTIVATED_KEY = "WORK_MODE_ACTIVATED";
     public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
     public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
@@ -153,11 +153,11 @@ public class WorkModeServiceTest {
     }
 
     private void setWorkStartTime() {
-        when(sharedPreferences.getInt(WORK_START_TIME_KEY, 0)).thenReturn((START_WORK_TIME.toDateTime().getSecondOfDay()));
+        when(sharedPreferences.getInt(WORK_START_TIME_KEY, 0)).thenReturn((START_WORK_TIME.getMillisOfDay()));
     }
 
     private void setWorkEndTime() {
-        when(sharedPreferences.getInt(WORK_END_TIME_KEY, 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
+        when(sharedPreferences.getInt(WORK_END_TIME_KEY, 0)).thenReturn((END_WORK_TIME.getMillisOfDay()));
     }
 
     private void setWorkModeToActivatedMode() {
@@ -169,8 +169,8 @@ public class WorkModeServiceTest {
     }
 
 
-    private static void setCurrentTime(LocalDateTime localDateTime) {
-        setCurrentMillisFixed(localDateTime.toDate().getTime());
+    private static void setCurrentTime(LocalTime localTime) {
+        setCurrentMillisFixed(localTime.toDateTimeToday().getMillis());
     }
 
     private static void resetToPresent() {

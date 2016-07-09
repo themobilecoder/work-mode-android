@@ -64,12 +64,12 @@ public class WorkModeService {
         int endTimeInSecondsOfDay = sharedPreferences.getInt(WORK_END_TIME_KEY, 0);
         DateTime now = now();
 
-        return startTimeInSecondsOfDay <= now.getSecondOfDay() && now.getSecondOfDay() <= endTimeInSecondsOfDay;
+        return startTimeInSecondsOfDay <= now.getMillisOfDay() && now.getMillisOfDay() <= endTimeInSecondsOfDay;
     }
 
     private boolean nowIsAfterWorkHours() {
         int endTimeInSecondsOfDay = sharedPreferences.getInt(WORK_END_TIME_KEY, 0);
-        return now().getSecondOfDay() >= endTimeInSecondsOfDay;
+        return now().getMillisOfDay() >= endTimeInSecondsOfDay;
     }
 
     private void saveModeActivated() {

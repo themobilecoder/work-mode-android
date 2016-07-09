@@ -16,6 +16,7 @@ import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static com.google.common.truth.Truth.assertThat;
 import static org.joda.time.DateTimeUtils.setCurrentMillisFixed;
 import static org.joda.time.DateTimeUtils.setCurrentMillisSystem;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -145,6 +146,35 @@ public class WorkModeServiceTest {
         verify(sharedPreferencesEditor).putBoolean(WORK_MODE_ACTIVATED_KEY, false);
         verify(sharedPreferencesEditor).apply();
         verify(sharedPreferences).getBoolean(WORK_MODE_ACTIVATED_KEY, false);
+    }
+
+    @Test
+    public void shouldPersistWorkHours() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putInt(WORK_START_TIME_KEY, START_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putInt(WORK_END_TIME_KEY, END_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
+
+        workModeService.setWorkHours(START_WORK_TIME, END_WORK_TIME);
+
+        verify(sharedPreferences).edit();
+        verify(sharedPreferencesEditor).putInt(WORK_START_TIME_KEY, START_WORK_TIME.getMillisOfDay());
+        verify(sharedPreferencesEditor).putInt(WORK_END_TIME_KEY, END_WORK_TIME.getMillisOfDay());
+        verify(sharedPreferencesEditor).apply();
+    }
+
+    @Test
+    public void shouldNotAllowStartOfWorkTimeAfterTheEndOfWorkTime() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putInt(WORK_START_TIME_KEY, END_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putInt(WORK_END_TIME_KEY, START_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
+
+        try {
+            workModeService.setWorkHours(END_WORK_TIME, START_WORK_TIME);
+            fail("Should throw an illegal argument exception");
+        } catch (IllegalArgumentException exception) {
+            //Ignore Exception
+        }
+
     }
 
     private void setWorkHours() {

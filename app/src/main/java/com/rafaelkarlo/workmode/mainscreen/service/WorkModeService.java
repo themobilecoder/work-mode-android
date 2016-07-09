@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 
 import static org.joda.time.DateTime.now;
 
@@ -51,6 +52,13 @@ public class WorkModeService {
         return sharedPreferences.getBoolean(WORK_MODE_ACTIVATED, false);
     }
 
+    public void setWorkHours(LocalTime workStartTime, LocalTime workEndTime) {
+        if (workStartTime.isAfter(workEndTime)) {
+            throw new IllegalArgumentException("Work start time should be before the work end time");
+        }
+        saveWorkHoursToSharedPreferences(workStartTime, workEndTime);
+    }
+
     private boolean canSetToSilentMode() {
         return nowIsWithinWorkHours() && isActivated();
     }
@@ -82,5 +90,12 @@ public class WorkModeService {
 
     private void saveInSharedPreferences(boolean activated) {
         sharedPreferences.edit().putBoolean(WORK_MODE_ACTIVATED, activated).apply();
+    }
+
+    private void saveWorkHoursToSharedPreferences(LocalTime workStartTime, LocalTime workEndTime) {
+        sharedPreferences.edit()
+                .putInt(WORK_START_TIME_KEY, workStartTime.getMillisOfDay())
+                .putInt(WORK_END_TIME_KEY, workEndTime.getMillisOfDay())
+                .apply();
     }
 }

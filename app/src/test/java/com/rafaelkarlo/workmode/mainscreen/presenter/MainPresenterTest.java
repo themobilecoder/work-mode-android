@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 public class MainPresenterTest {
 
     @Mock
-    private MainView mainActivity;
+    private MainView mainView;
 
     @Mock
     private WorkModeService workModeService;
@@ -27,7 +27,7 @@ public class MainPresenterTest {
     @Before
     public void setupPresenter() {
         mainPresenter = new MainPresenterImpl(workModeService);
-        mainPresenter.attachView(mainActivity);
+        mainPresenter.attachView(mainView);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class MainPresenterTest {
         mainPresenter.activateWorkMode();
 
         verify(workModeService).activate();
-        verify(mainActivity).onWorkModeActivation();
+        verify(mainView).onWorkModeActivation();
     }
 
     @Test
@@ -43,7 +43,7 @@ public class MainPresenterTest {
         mainPresenter.deactivateWorkMode();
 
         verify(workModeService).deactivate();
-        verify(mainActivity).onWorkModeDeactivation();
+        verify(mainView).onWorkModeDeactivation();
     }
 
     @Test
@@ -52,8 +52,8 @@ public class MainPresenterTest {
 
         mainPresenter.onCreate();
 
-        verify(mainActivity).onWorkModeActivation();
-        verifyNoMoreInteractions(mainActivity);
+        verify(mainView).onWorkModeActivation();
+        verifyNoMoreInteractions(mainView);
     }
 
     @Test
@@ -62,8 +62,8 @@ public class MainPresenterTest {
 
         mainPresenter.onCreate();
 
-        verify(mainActivity).onWorkModeDeactivation();
-        verifyNoMoreInteractions(mainActivity);
+        verify(mainView).onWorkModeDeactivation();
+        verifyNoMoreInteractions(mainView);
     }
 
 }

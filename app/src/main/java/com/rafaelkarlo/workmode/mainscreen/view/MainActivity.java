@@ -40,6 +40,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mainPresenter.onCreate();
     }
 
+    @Override
+    public void onWorkModeActivation() {
+        setViewToActivated();
+    }
+
+    @Override
+    public void onWorkModeDeactivation() {
+        setViewToDeactivated();
+    }
+
     @OnCheckedChanged(R.id.switchButton)
     public void whenSwitchHasChanged(SwitchCompat switchButton) {
         if (switchButton.isShown()) {
@@ -49,16 +59,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 mainPresenter.deactivateWorkMode();
             }
         }
-    }
-
-    @Override
-    public void onWorkModeActivation() {
-        setViewToActivated();
-    }
-
-    @Override
-    public void onWorkModeDeactivation() {
-        setViewToDeactivated();
     }
 
     private void setViewToDeactivated() {

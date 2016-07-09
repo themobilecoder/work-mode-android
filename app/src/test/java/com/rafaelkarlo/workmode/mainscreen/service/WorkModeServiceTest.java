@@ -26,6 +26,8 @@ public class WorkModeServiceTest {
     public static final LocalDateTime START_WORK_TIME = new LocalDateTime(2016, 7, 28, 9, 0, 0);
     private static final LocalDateTime END_WORK_TIME = new LocalDateTime(2016, 7, 28, 17, 0, 0);
     public static final String WORK_MODE_ACTIVATED_KEY = "WORK_MODE_ACTIVATED";
+    public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
+    public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
     private WorkModeService workModeService;
 
     @Mock
@@ -44,12 +46,26 @@ public class WorkModeServiceTest {
     }
 
     @Test
-    public void shouldSetToSilentModeDuringWorkHours() {
-        when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
-        when(sharedPreferences.getInt("WORK_START_TIME", 0)).thenReturn((START_WORK_TIME.toDateTime().getSecondOfDay()));
-        when(sharedPreferences.getInt("WORK_END_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
-
+    public void shouldOnlySetAModeIfWorkModeIsActivated() {
+        setWorkHours();
+        setWorkModeToDeactivatedMode();
         setCurrentTime(START_WORK_TIME);
+
+        assertThat(workModeService.setToSilentMode()).isFalse();
+
+        setCurrentTime(END_WORK_TIME);
+
+        assertThat(workModeService.setToNormalMode()).isFalse();
+
+        verifyZeroInteractions(audioManager);
+    }
+
+    @Test
+    public void shouldSetToSilentModeDuringWorkHours() {
+        setWorkHours();
+        setWorkModeToActivatedMode();
+        setCurrentTime(START_WORK_TIME);
+        when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
 
         assertThat(workModeService.setToSilentMode()).isTrue();
 
@@ -58,18 +74,17 @@ public class WorkModeServiceTest {
 
     @Test
     public void shouldNotSetToSilentModeWhenBeforeWorkHours() {
-        when(sharedPreferences.getInt("WORK_START_TIME", 0)).thenReturn((START_WORK_TIME.toDateTime().getSecondOfDay()));
-
+        setWorkStartTime();
         setCurrentTime(START_WORK_TIME.minusMinutes(1));
 
         assertThat(workModeService.setToSilentMode()).isFalse();
+
         verifyZeroInteractions(audioManager);
     }
 
     @Test
     public void shouldNotSetToSilentModeAfterWorkHours() {
-        when(sharedPreferences.getInt("WORK_END_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
-
+        setWorkEndTime();
         setCurrentTime(END_WORK_TIME.plusMinutes(1));
 
         assertThat(workModeService.setToSilentMode()).isFalse();
@@ -78,10 +93,11 @@ public class WorkModeServiceTest {
 
     @Test
     public void shouldSetToNormalModeAfterWorkHours() {
-        when(sharedPreferences.getInt("WORK_END_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
+        setWorkModeToActivatedMode();
+        setWorkEndTime();
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_NORMAL);
 
-        setCurrentTime(END_WORK_TIME.plusMinutes(1));
+        setCurrentTime(END_WORK_TIME);
 
         assertThat(workModeService.setToNormalMode()).isTrue();
 
@@ -90,7 +106,7 @@ public class WorkModeServiceTest {
 
     @Test
     public void shouldNotSetToNormalModeBeforeEndOfWorkHours() {
-        when(sharedPreferences.getInt("WORK_END_TIME", 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
+        setWorkEndTime();
 
         setCurrentTime(END_WORK_TIME.minusMinutes(1));
 
@@ -103,37 +119,53 @@ public class WorkModeServiceTest {
     public void shouldPersistWhenWorkModeIsActivated() {
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, true)).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(true);
+        setWorkModeToActivatedMode();
 
         workModeService.activate();
+
         assertThat(workModeService.isActivated()).isTrue();
 
         verify(sharedPreferences).edit();
         verify(sharedPreferencesEditor).putBoolean(WORK_MODE_ACTIVATED_KEY, true);
         verify(sharedPreferencesEditor).apply();
-
         verify(sharedPreferences).getBoolean(WORK_MODE_ACTIVATED_KEY, false);
     }
 
     @Test
     public void shouldPersistWhenWorkModeIsDeactivated() {
+        setWorkModeToDeactivatedMode();
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(false);
 
         workModeService.deactivate();
+
         assertThat(workModeService.isActivated()).isFalse();
 
         verify(sharedPreferences).edit();
         verify(sharedPreferencesEditor).putBoolean(WORK_MODE_ACTIVATED_KEY, false);
         verify(sharedPreferencesEditor).apply();
-
         verify(sharedPreferences).getBoolean(WORK_MODE_ACTIVATED_KEY, false);
     }
 
-    @Test
-    public void shouldNotSetAnythingWhenWorkModeIsNotActivated() {
+    private void setWorkHours() {
+        setWorkStartTime();
+        setWorkEndTime();
+    }
 
+    private void setWorkStartTime() {
+        when(sharedPreferences.getInt(WORK_START_TIME_KEY, 0)).thenReturn((START_WORK_TIME.toDateTime().getSecondOfDay()));
+    }
+
+    private void setWorkEndTime() {
+        when(sharedPreferences.getInt(WORK_END_TIME_KEY, 0)).thenReturn((END_WORK_TIME.toDateTime().getSecondOfDay()));
+    }
+
+    private void setWorkModeToActivatedMode() {
+        when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(true);
+    }
+
+    private void setWorkModeToDeactivatedMode() {
+        when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(false);
     }
 
 

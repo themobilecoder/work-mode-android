@@ -1,5 +1,6 @@
 package com.rafaelkarlo.workmode.mainscreen.config;
 
+import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmReceiver;
 import com.rafaelkarlo.workmode.mainscreen.view.MainActivity;
 
 import javax.inject.Singleton;
@@ -10,4 +11,5 @@ import dagger.Component;
 @Component(modules = MainActivityModule.class)
 public interface MainActivityComponent {
     void inject(MainActivity mainScreenActivity);
+    void inject(WorkModeAlarmReceiver workModeAlarmReceiver);
 }

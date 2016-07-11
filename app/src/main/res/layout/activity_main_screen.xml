@@ -1,38 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".mainscreen.view.MainActivity">
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/work_mode_status_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="80dp"
+                android:text="@string/work_mode_status_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/work_mode_status_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/work_mode_status_label"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Enabled"
+                tools:textColor="#388E3C" />
+
+            <TextView
+                android:id="@+id/work_hours_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/work_mode_status_label"
+                android:text="@string/work_hours_label"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/work_hours_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/work_mode_status_value"
+                android:layout_below="@id/work_mode_status_value"
+                android:layout_toEndOf="@id/work_hours_label"
+                android:gravity="center"
+                android:text="@string/blank_work_hours"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="10:00 AM - 11:00 PM" />
+
+            <Button
+                android:id="@+id/set_clock_button"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/work_hours_value"
+                android:layout_below="@id/work_hours_value"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp"
+                android:text="@string/set_work_hours_text" />
+
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
     <android.support.v7.widget.SwitchCompat
-        android:thumbTextPadding="40dp"
-        android:switchMinWidth="40dp"
         android:id="@+id/switchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
         android:checked="false"
-        android:textOff="@string/activate_string"
-        android:layout_below="@+id/workModeStatus"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="39dp" />
+        android:thumb="@drawable/ic_recurrence_bubble_fill"
+        android:theme="@style/MySwitch" />
 
-    <TextView
-        android:id="@+id/workModeStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/inactive"
-        android:textSize="32sp"
-        android:textColor="@color/red"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="63dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+</LinearLayout>

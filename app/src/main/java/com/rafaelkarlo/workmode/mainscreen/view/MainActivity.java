@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @BindView(R.id.switchButton)
     SwitchCompat switchButton;
 
-    @BindView(R.id.workModeStatus)
+    @BindView(R.id.work_mode_status_value)
     TextView workModeStatus;
 
     @Override
@@ -62,13 +62,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     private void setViewToDeactivated() {
-        workModeStatus.setText("Deactivated");
+        workModeStatus.setText("Disabled");
         workModeStatus.setTextColor(getResources().getColor(R.color.red));
         switchButton.setChecked(false);
     }
 
     private void setViewToActivated() {
-        workModeStatus.setText("Activated");
+        workModeStatus.setText("Enabled");
         workModeStatus.setTextColor(getResources().getColor(R.color.green));
         switchButton.setChecked(true);
     }

@@ -2,4 +2,8 @@
     <string name="app_name">Work Mode</string>
     <string name="activate_string">Activate</string>
     <string name="inactive">Inactive</string>
+    <string name="work_mode_status_text">STATUS</string>
+    <string name="work_hours_label">WORK HOURS</string>
+    <string name="blank_work_hours">-- --</string>
+    <string name="set_work_hours_text">Set Work Hours</string>
 </resources>

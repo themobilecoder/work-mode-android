@@ -4,4 +4,9 @@ public interface MainView {
 
     void onWorkModeActivation();
     void onWorkModeDeactivation();
+    void onSetStartDate(String startDate);
+    void onSetEndDate(String endDate);
+    void displayErrorOnMissingWorkHours();
+    void displayErrorOnInvalidWorkHours();
+
 }

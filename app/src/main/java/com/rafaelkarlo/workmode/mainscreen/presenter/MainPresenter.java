@@ -8,4 +8,6 @@ public interface MainPresenter {
     void attachView(MainView mainView);
     void activateWorkMode();
     void deactivateWorkMode();
+    void setStartDate(int hour, int minute);
+    void setEndDate(int hour, int minute);
 }

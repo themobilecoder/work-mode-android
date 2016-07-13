@@ -59,6 +59,34 @@ public class WorkModeService {
         saveWorkHoursToSharedPreferences(workStartTime, workEndTime);
     }
 
+    public void setStartTime(LocalTime workStartTime) {
+        sharedPreferences.edit()
+                .putInt(WORK_START_TIME_KEY, workStartTime.getMillisOfDay())
+                .apply();
+    }
+
+    public void setEndTime(LocalTime workEndTime) {
+        sharedPreferences.edit()
+                .putInt(WORK_END_TIME_KEY, workEndTime.getMillisOfDay())
+                .apply();
+    }
+
+    public LocalTime getStartTime() {
+        int timeInMillis = sharedPreferences.getInt(WORK_START_TIME_KEY, -1);
+        if (timeInMillis == -1) {
+            return null;
+        }
+        return LocalTime.fromMillisOfDay(timeInMillis);
+    }
+
+    public LocalTime getEndTime() {
+        int timeInMillis = sharedPreferences.getInt(WORK_END_TIME_KEY, -1);
+        if (timeInMillis == -1) {
+            return null;
+        }
+        return LocalTime.fromMillisOfDay(timeInMillis);
+    }
+
     private boolean canSetToSilentMode() {
         return nowIsWithinWorkHours() && isActivated();
     }

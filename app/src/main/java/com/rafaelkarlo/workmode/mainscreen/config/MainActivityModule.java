@@ -59,7 +59,7 @@ public class MainActivityModule {
     @Provides
     @Singleton
     public MainPresenterImpl provideMainPresenter() {
-        return new MainPresenterImpl(provideWorkModeService());
+        return new MainPresenterImpl(provideWorkModeService(), provideWorkModeAlarm());
     }
 
     @Provides

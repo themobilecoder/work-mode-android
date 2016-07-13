@@ -17,6 +17,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.joda.time.DateTimeUtils.setCurrentMillisFixed;
 import static org.joda.time.DateTimeUtils.setCurrentMillisSystem;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,7 @@ public class WorkModeServiceTest {
     public static final String WORK_MODE_ACTIVATED_KEY = "WORK_MODE_ACTIVATED";
     public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
     public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
+    private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
     private WorkModeService workModeService;
 
     @Mock
@@ -120,15 +122,17 @@ public class WorkModeServiceTest {
     public void shouldPersistWhenWorkModeIsActivated() {
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, true)).thenReturn(sharedPreferencesEditor);
+        when(audioManager.getRingerMode()).thenReturn(AudioManager.RINGER_MODE_VIBRATE);
+        when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE)).thenReturn(sharedPreferencesEditor);
         setWorkModeToActivatedMode();
 
         workModeService.activate();
 
         assertThat(workModeService.isActivated()).isTrue();
 
-        verify(sharedPreferences).edit();
+        verify(sharedPreferences, atLeastOnce()).edit();
         verify(sharedPreferencesEditor).putBoolean(WORK_MODE_ACTIVATED_KEY, true);
-        verify(sharedPreferencesEditor).apply();
+        verify(sharedPreferencesEditor, atLeastOnce()).apply();
         verify(sharedPreferences).getBoolean(WORK_MODE_ACTIVATED_KEY, false);
     }
 
@@ -163,6 +167,23 @@ public class WorkModeServiceTest {
     }
 
     @Test
+    public void shouldPersistCurrentModeBeforeActivating() {
+        setExistingRingerMode();
+
+        when(audioManager.getRingerMode()).thenReturn(AudioManager.RINGER_MODE_VIBRATE);
+        when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE)).thenReturn(sharedPreferencesEditor);
+
+        workModeService.activate();
+
+        verify(sharedPreferences, atLeastOnce()).edit();
+        verify(sharedPreferencesEditor).putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE);
+        verify(sharedPreferencesEditor).putBoolean(WORK_MODE_ACTIVATED_KEY, true);
+        verify(sharedPreferencesEditor, atLeastOnce()).apply();
+    }
+
+    @Test
     public void shouldNotAllowStartOfWorkTimeAfterTheEndOfWorkTime() {
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         when(sharedPreferencesEditor.putInt(WORK_START_TIME_KEY, END_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
@@ -188,6 +209,10 @@ public class WorkModeServiceTest {
 
     private void setWorkEndTime() {
         when(sharedPreferences.getInt(WORK_END_TIME_KEY, 0)).thenReturn((END_WORK_TIME.getMillisOfDay()));
+    }
+
+    private void setExistingRingerMode() {
+        when(sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, 0)).thenReturn((AudioManager.RINGER_MODE_VIBRATE));
     }
 
     private void setWorkModeToActivatedMode() {

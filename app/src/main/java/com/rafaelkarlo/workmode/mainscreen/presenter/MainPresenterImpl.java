@@ -43,6 +43,7 @@ public class MainPresenterImpl implements MainPresenter {
     @Override
     public void deactivateWorkMode() {
         workModeService.deactivate();
+        workModeService.setToPreviousMode();
         mainView.onWorkModeDeactivation();
         workModeAlarm.cancelAlarm();
     }

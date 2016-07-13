@@ -13,6 +13,7 @@ public class WorkModeService {
     private static final String WORK_MODE_ACTIVATED = "WORK_MODE_ACTIVATED";
     public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
     public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
+    private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
 
     private AudioManager audioManager;
     private SharedPreferences sharedPreferences;
@@ -40,7 +41,12 @@ public class WorkModeService {
         }
     }
 
+    public void setToPreviousMode() {
+        audioManager.setRingerMode(getPreviousRingerMode());
+    }
+
     public void activate() {
+        saveCurrentRingerMode();
         saveModeActivated();
     }
 
@@ -87,6 +93,10 @@ public class WorkModeService {
         return LocalTime.fromMillisOfDay(timeInMillis);
     }
 
+    private int getPreviousRingerMode() {
+        return sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, 0);
+    }
+
     private boolean canSetToSilentMode() {
         return nowIsWithinWorkHours() && isActivated();
     }
@@ -108,15 +118,20 @@ public class WorkModeService {
         return now().getMillisOfDay() >= endTimeInSecondsOfDay;
     }
 
+    private void saveCurrentRingerMode() {
+        int currentRingerMode = audioManager.getRingerMode();
+        sharedPreferences.edit().putInt(PREVIOUS_RINGER_MODE_KEY, currentRingerMode).apply();
+    }
+
     private void saveModeActivated() {
-        saveInSharedPreferences(true);
+        saveModeInSharedPreferences(true);
     }
 
     private void saveModeDeactivated() {
-        saveInSharedPreferences(false);
+        saveModeInSharedPreferences(false);
     }
 
-    private void saveInSharedPreferences(boolean activated) {
+    private void saveModeInSharedPreferences(boolean activated) {
         sharedPreferences.edit().putBoolean(WORK_MODE_ACTIVATED, activated).apply();
     }
 

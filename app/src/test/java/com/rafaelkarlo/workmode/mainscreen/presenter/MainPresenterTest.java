@@ -148,4 +148,11 @@ public class MainPresenterTest {
         verify(workModeAlarm).cancelAlarm();
     }
 
+    @Test
+    public void shouldReturnToPreviousRingerModeWhenDeactivating() {
+        mainPresenter.deactivateWorkMode();
+
+        verify(workModeService).setToPreviousMode();
+    }
+
 }

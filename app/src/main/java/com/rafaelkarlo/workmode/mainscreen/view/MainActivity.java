@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
+import static java.lang.String.format;
 import static org.joda.time.LocalTime.now;
 
 public class MainActivity extends AppCompatActivity implements MainView, RadialTimePickerDialogFragment.OnTimeSetListener {
@@ -82,14 +83,24 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     }
 
     @Override
+    public void displayActivationSuccessful() {
+        displaySuccessfulSnackbarWithMessage(
+                format("Muting phone from %s to %s",
+                        workStartTimeText.getText(),
+                        workEndTimeText.getText()
+                )
+        );
+    }
+
+    @Override
     public void displayErrorOnMissingWorkHours() {
-        displaySnackbarWithMessage("Please set the work hours first");
+        displayErrorSnackbarWithMessage("Please set the work hours first");
         switchButton.setChecked(false);
     }
 
     @Override
     public void displayErrorOnInvalidWorkHours() {
-        displaySnackbarWithMessage("Start time should be before end time");
+        displayErrorSnackbarWithMessage("Start time should be before Stop time");
         switchButton.setChecked(false);
     }
 
@@ -152,10 +163,21 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
         ButterKnife.bind(this);
     }
 
-    private void displaySnackbarWithMessage(String message) {
+    private void displayErrorSnackbarWithMessage(String message) {
         View parentView = findViewById(R.id.parent_layout);
         if (parentView != null) {
-            Snackbar.make(parentView, message, Snackbar.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(parentView, message, Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.errorBackground));
+            snackbar.show();
+        }
+    }
+
+    private void displaySuccessfulSnackbarWithMessage(String message) {
+        View parentView = findViewById(R.id.parent_layout);
+        if (parentView != null) {
+            Snackbar snackbar = Snackbar.make(parentView, message, Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.successfulBackground));
+            snackbar.show();
         }
     }
 }

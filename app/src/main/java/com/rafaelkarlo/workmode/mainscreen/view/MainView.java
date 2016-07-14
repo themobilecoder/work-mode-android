@@ -6,6 +6,7 @@ public interface MainView {
     void onWorkModeDeactivation();
     void onSetStartDate(String startDate);
     void onSetEndDate(String endDate);
+    void displayActivationSuccessful();
     void displayErrorOnMissingWorkHours();
     void displayErrorOnInvalidWorkHours();
 

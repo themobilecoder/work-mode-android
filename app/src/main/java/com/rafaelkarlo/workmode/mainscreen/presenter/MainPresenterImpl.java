@@ -76,6 +76,7 @@ public class MainPresenterImpl implements MainPresenter {
             workModeService.activate();
             workModeAlarm.startAlarm(startTime, endTime);
             mainView.onWorkModeActivation();
+            mainView.displayActivationSuccessful();
         }
     }
 

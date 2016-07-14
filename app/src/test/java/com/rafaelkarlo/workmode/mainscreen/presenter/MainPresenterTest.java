@@ -46,6 +46,7 @@ public class MainPresenterTest {
 
         verify(workModeService).activate();
         verify(mainView).onWorkModeActivation();
+        verify(mainView).displayActivationSuccessful();
     }
 
     @Test

@@ -6,6 +6,7 @@ import android.media.AudioManager;
 
 import org.joda.time.LocalTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -64,6 +65,7 @@ public class WorkModeServiceTest {
     }
 
     @Test
+    @Ignore(value = "Refactor to wrap audio manager so that audio manager needs not to be mocked")
     public void shouldSetToSilentModeDuringWorkHours() {
         setWorkHours();
         setWorkModeToActivatedMode();

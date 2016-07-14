@@ -6,7 +6,12 @@ import android.media.AudioManager;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
+import rx.Observable;
+import rx.Subscriber;
+
 import static org.joda.time.DateTime.now;
+import static rx.android.schedulers.AndroidSchedulers.*;
+import static rx.schedulers.Schedulers.*;
 
 public class WorkModeService {
 
@@ -18,6 +23,13 @@ public class WorkModeService {
     private AudioManager audioManager;
     private SharedPreferences sharedPreferences;
 
+    private final Observable<Void> setSilentModeTask = Observable.create(new Observable.OnSubscribe<Void>() {
+        @Override
+        public void call(Subscriber<? super Void> subscriber) {
+            setRingerModeToSilentCompletely();
+        }
+    });
+
     public WorkModeService(AudioManager audioManager, SharedPreferences sharedPreferences) {
         this.audioManager = audioManager;
         this.sharedPreferences = sharedPreferences;
@@ -26,7 +38,10 @@ public class WorkModeService {
     public boolean setToSilentMode() {
         if (canSetToSilentMode()) {
             saveCurrentRingerMode();
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            setSilentModeTask
+                    .subscribeOn(io())
+                    .observeOn(mainThread())
+                    .subscribe();
             return true;
         } else {
             return false;
@@ -140,5 +155,14 @@ public class WorkModeService {
                 .putInt(WORK_START_TIME_KEY, workStartTime.getMillisOfDay())
                 .putInt(WORK_END_TIME_KEY, workEndTime.getMillisOfDay())
                 .apply();
+    }
+
+    private void setRingerModeToSilentCompletely() {
+        try {
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            Thread.sleep(1000);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+        } catch (InterruptedException e) {
+        }
     }
 }

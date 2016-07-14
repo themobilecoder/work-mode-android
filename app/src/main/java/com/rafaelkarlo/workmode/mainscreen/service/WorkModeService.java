@@ -25,6 +25,7 @@ public class WorkModeService {
 
     public boolean setToSilentMode() {
         if (canSetToSilentMode()) {
+            saveCurrentRingerMode();
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             return true;
         } else {
@@ -46,7 +47,6 @@ public class WorkModeService {
     }
 
     public void activate() {
-        saveCurrentRingerMode();
         saveModeActivated();
     }
 

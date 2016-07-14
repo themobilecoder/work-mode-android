@@ -69,6 +69,7 @@ public class WorkModeServiceTest {
         setWorkModeToActivatedMode();
         setCurrentTime(START_WORK_TIME);
         when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
+        setupMockForSavingPreviousMode();
 
         assertThat(workModeService.setToSilentMode()).isTrue();
 
@@ -167,20 +168,10 @@ public class WorkModeServiceTest {
     }
 
     @Test
-    public void shouldPersistCurrentModeBeforeActivating() {
-        setExistingRingerMode();
+    public void shouldPersistCurrentModeWhenSettingTheMode() {
 
-        when(audioManager.getRingerMode()).thenReturn(AudioManager.RINGER_MODE_VIBRATE);
-        when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, true)).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE)).thenReturn(sharedPreferencesEditor);
 
-        workModeService.activate();
-
-        verify(sharedPreferences, atLeastOnce()).edit();
-        verify(sharedPreferencesEditor).putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE);
-        verify(sharedPreferencesEditor).putBoolean(WORK_MODE_ACTIVATED_KEY, true);
-        verify(sharedPreferencesEditor, atLeastOnce()).apply();
+        workModeService.setToSilentMode();
     }
 
     @Test
@@ -196,6 +187,11 @@ public class WorkModeServiceTest {
             //Ignore Exception
         }
 
+    }
+
+    private void setupMockForSavingPreviousMode() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_SILENT)).thenReturn(sharedPreferencesEditor);
     }
 
     private void setWorkHours() {

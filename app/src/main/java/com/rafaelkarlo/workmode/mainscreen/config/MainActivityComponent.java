@@ -1,6 +1,6 @@
 package com.rafaelkarlo.workmode.mainscreen.config;
 
-import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmReceiver;
+import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmReceiver;
 import com.rafaelkarlo.workmode.mainscreen.view.MainActivity;
 
 import javax.inject.Singleton;

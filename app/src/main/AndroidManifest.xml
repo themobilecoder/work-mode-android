@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".mainscreen.service.WorkModeAlarmReceiver"/>
+        <receiver android:name=".mainscreen.service.alarm.WorkModeAlarmReceiver"/>
 
     </application>
 

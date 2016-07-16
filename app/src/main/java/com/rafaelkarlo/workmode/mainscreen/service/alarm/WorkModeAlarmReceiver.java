@@ -1,4 +1,4 @@
-package com.rafaelkarlo.workmode.mainscreen.service;
+package com.rafaelkarlo.workmode.mainscreen.service.alarm;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
@@ -8,16 +8,12 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.rafaelkarlo.workmode.MainApplication;
+import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
 
 import javax.inject.Inject;
 
 import static android.app.AlarmManager.RTC_WAKEUP;
-import static com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmUtils.ONE_DAY_IN_MILLIS;
-import static com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmUtils.WORK_END_ACTION;
-import static com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmUtils.WORK_START_ACTION;
-import static com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmUtils.createIntentWithIdentifierAndTime;
-import static com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmUtils.createPendingIntentWithIntent;
-import static com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmUtils.getActionIdentifierWithTimeKey;
+import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.*;
 
 public class WorkModeAlarmReceiver extends BroadcastReceiver{
 

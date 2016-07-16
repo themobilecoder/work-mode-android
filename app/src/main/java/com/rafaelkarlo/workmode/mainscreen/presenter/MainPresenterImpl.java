@@ -1,6 +1,6 @@
 package com.rafaelkarlo.workmode.mainscreen.presenter;
 
-import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarm;
+import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 

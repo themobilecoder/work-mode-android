@@ -1,4 +1,4 @@
-package com.rafaelkarlo.workmode.mainscreen.service;
+package com.rafaelkarlo.workmode.mainscreen.service.alarm;
 
 import android.app.PendingIntent;
 import android.content.Context;

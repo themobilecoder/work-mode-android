@@ -1,4 +1,4 @@
-package com.rafaelkarlo.workmode.mainscreen.service;
+package com.rafaelkarlo.workmode.mainscreen.service.alarm;
 
 import org.joda.time.LocalTime;
 

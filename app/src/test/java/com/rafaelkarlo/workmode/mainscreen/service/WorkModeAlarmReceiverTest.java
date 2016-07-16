@@ -6,15 +6,14 @@ import android.content.Intent;
 
 import com.rafaelkarlo.workmode.MainApplication;
 import com.rafaelkarlo.workmode.mainscreen.config.MainActivityComponent;
+import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmReceiver;
+import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;

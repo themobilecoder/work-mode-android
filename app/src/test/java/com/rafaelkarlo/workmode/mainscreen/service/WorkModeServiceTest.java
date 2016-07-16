@@ -4,17 +4,19 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
+
 import org.joda.time.LocalTime;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static android.media.AudioManager.RINGER_MODE_NORMAL;
-import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static com.google.common.truth.Truth.assertThat;
+import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.NORMAL;
+import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT;
+import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.VIBRATE;
 import static org.joda.time.DateTimeUtils.setCurrentMillisFixed;
 import static org.joda.time.DateTimeUtils.setCurrentMillisSystem;
 import static org.junit.Assert.fail;
@@ -35,7 +37,7 @@ public class WorkModeServiceTest {
     private WorkModeService workModeService;
 
     @Mock
-    AudioManager audioManager;
+    AudioModeService audioModeService;
 
     @Mock
     SharedPreferences sharedPreferences;
@@ -45,7 +47,7 @@ public class WorkModeServiceTest {
 
     @Before
     public void setup() {
-        workModeService = new WorkModeService(audioManager, sharedPreferences);
+        workModeService = new WorkModeService(audioModeService, sharedPreferences);
         resetToPresent();
     }
 
@@ -61,21 +63,20 @@ public class WorkModeServiceTest {
 
         assertThat(workModeService.setToNormalMode()).isFalse();
 
-        verifyZeroInteractions(audioManager);
+        verifyZeroInteractions(audioModeService);
     }
 
     @Test
-    @Ignore(value = "Refactor to wrap audio manager so that audio manager needs not to be mocked")
     public void shouldSetToSilentModeDuringWorkHours() {
         setWorkHours();
         setWorkModeToActivatedMode();
         setCurrentTime(START_WORK_TIME);
-        when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_SILENT);
+        when(audioModeService.getCurrentMode()).thenReturn(SILENT);
         setupMockForSavingPreviousMode();
 
         assertThat(workModeService.setToSilentMode()).isTrue();
 
-        verify(audioManager).setRingerMode(RINGER_MODE_SILENT);
+        verify(audioModeService).setModeTo(SILENT);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class WorkModeServiceTest {
 
         assertThat(workModeService.setToSilentMode()).isFalse();
 
-        verifyZeroInteractions(audioManager);
+        verifyZeroInteractions(audioModeService);
     }
 
     @Test
@@ -94,20 +95,20 @@ public class WorkModeServiceTest {
         setCurrentTime(END_WORK_TIME.plusMinutes(1));
 
         assertThat(workModeService.setToSilentMode()).isFalse();
-        verifyZeroInteractions(audioManager);
+        verifyZeroInteractions(audioModeService);
     }
 
     @Test
     public void shouldSetToNormalModeAfterWorkHours() {
         setWorkModeToActivatedMode();
         setWorkEndTime();
-        when(audioManager.getRingerMode()).thenReturn(RINGER_MODE_NORMAL);
+        when(audioModeService.getCurrentMode()).thenReturn(NORMAL);
 
         setCurrentTime(END_WORK_TIME);
 
         assertThat(workModeService.setToNormalMode()).isTrue();
 
-        verify(audioManager).setRingerMode(RINGER_MODE_NORMAL);
+        verify(audioModeService).setModeTo(NORMAL);
     }
 
     @Test
@@ -118,14 +119,14 @@ public class WorkModeServiceTest {
 
         assertThat(workModeService.setToNormalMode()).isFalse();
 
-        verifyZeroInteractions(audioManager);
+        verifyZeroInteractions(audioModeService);
     }
 
     @Test
     public void shouldPersistWhenWorkModeIsActivated() {
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, true)).thenReturn(sharedPreferencesEditor);
-        when(audioManager.getRingerMode()).thenReturn(AudioManager.RINGER_MODE_VIBRATE);
+        when(audioModeService.getCurrentMode()).thenReturn(VIBRATE);
         when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE)).thenReturn(sharedPreferencesEditor);
         setWorkModeToActivatedMode();
 
@@ -209,10 +210,6 @@ public class WorkModeServiceTest {
         when(sharedPreferences.getInt(WORK_END_TIME_KEY, 0)).thenReturn((END_WORK_TIME.getMillisOfDay()));
     }
 
-    private void setExistingRingerMode() {
-        when(sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, 0)).thenReturn((AudioManager.RINGER_MODE_VIBRATE));
-    }
-
     private void setWorkModeToActivatedMode() {
         when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(true);
     }
@@ -220,7 +217,6 @@ public class WorkModeServiceTest {
     private void setWorkModeToDeactivatedMode() {
         when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(false);
     }
-
 
     private static void setCurrentTime(LocalTime localTime) {
         setCurrentMillisFixed(localTime.toDateTimeToday().getMillis());

@@ -11,6 +11,7 @@ import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAlarmReceiver;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeServiceImpl;
 
 import javax.inject.Singleton;
 
@@ -52,8 +53,14 @@ public class MainActivityModule {
 
     @Provides
     @Singleton
+    public AudioModeServiceImpl provideAudioModeService() {
+        return new AudioModeServiceImpl(provideAudioManager());
+    }
+
+    @Provides
+    @Singleton
     public WorkModeService provideWorkModeService() {
-        return new WorkModeService(provideAudioManager(), provideSharedPreferences());
+        return new WorkModeService(provideAudioModeService(), provideSharedPreferences());
     }
 
     @Provides

@@ -12,7 +12,7 @@ public enum AudioMode {
         this.value = intValue;
     }
 
-    int getValue() {
+    public int getIntValue() {
         return value;
     }
 }

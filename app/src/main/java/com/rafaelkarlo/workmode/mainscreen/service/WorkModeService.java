@@ -1,17 +1,19 @@
 package com.rafaelkarlo.workmode.mainscreen.service;
 
 import android.content.SharedPreferences;
-import android.media.AudioManager;
+
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode;
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
-import rx.Observable;
-import rx.Subscriber;
-
+import static android.media.AudioManager.RINGER_MODE_NORMAL;
+import static android.media.AudioManager.RINGER_MODE_SILENT;
+import static android.media.AudioManager.RINGER_MODE_VIBRATE;
+import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.NORMAL;
+import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT;
 import static org.joda.time.DateTime.now;
-import static rx.android.schedulers.AndroidSchedulers.*;
-import static rx.schedulers.Schedulers.*;
 
 public class WorkModeService {
 
@@ -20,28 +22,18 @@ public class WorkModeService {
     public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
     private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
 
-    private AudioManager audioManager;
+    private AudioModeService audioModeService;
     private SharedPreferences sharedPreferences;
 
-    private final Observable<Void> setSilentModeTask = Observable.create(new Observable.OnSubscribe<Void>() {
-        @Override
-        public void call(Subscriber<? super Void> subscriber) {
-            setRingerModeToSilentCompletely();
-        }
-    });
-
-    public WorkModeService(AudioManager audioManager, SharedPreferences sharedPreferences) {
-        this.audioManager = audioManager;
+    public WorkModeService(AudioModeService audioModeService, SharedPreferences sharedPreferences) {
+        this.audioModeService = audioModeService;
         this.sharedPreferences = sharedPreferences;
     }
 
     public boolean setToSilentMode() {
         if (canSetToSilentMode()) {
             saveCurrentRingerMode();
-            setSilentModeTask
-                    .subscribeOn(io())
-                    .observeOn(mainThread())
-                    .subscribe();
+            audioModeService.setModeTo(SILENT);
             return true;
         } else {
             return false;
@@ -50,7 +42,7 @@ public class WorkModeService {
 
     public boolean setToNormalMode() {
         if (canSetToNormalMode()) {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            audioModeService.setModeTo(NORMAL);
             return true;
         } else {
             return false;
@@ -58,7 +50,7 @@ public class WorkModeService {
     }
 
     public void setToPreviousMode() {
-        audioManager.setRingerMode(getPreviousRingerMode());
+        audioModeService.setModeTo(getPreviousRingerMode());
     }
 
     public void activate() {
@@ -108,9 +100,24 @@ public class WorkModeService {
         return LocalTime.fromMillisOfDay(timeInMillis);
     }
 
-    private int getPreviousRingerMode() {
-        return sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, 0);
+    private AudioMode getPreviousRingerMode() {
+
+        return transformToAudioMode(sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, -1));
     }
+
+    private AudioMode transformToAudioMode(int audioModeInInt) {
+        switch (audioModeInInt) {
+            case RINGER_MODE_NORMAL:
+                return AudioMode.NORMAL;
+            case RINGER_MODE_VIBRATE:
+                return AudioMode.VIBRATE;
+            case RINGER_MODE_SILENT:
+                return AudioMode.SILENT;
+            default:
+                return AudioMode.UNKNOWN;
+        }
+    }
+
 
     private boolean canSetToSilentMode() {
         return nowIsWithinWorkHours() && isActivated();
@@ -134,8 +141,8 @@ public class WorkModeService {
     }
 
     private void saveCurrentRingerMode() {
-        int currentRingerMode = audioManager.getRingerMode();
-        sharedPreferences.edit().putInt(PREVIOUS_RINGER_MODE_KEY, currentRingerMode).apply();
+        AudioMode currentRingerMode = audioModeService.getCurrentMode();
+        sharedPreferences.edit().putInt(PREVIOUS_RINGER_MODE_KEY, currentRingerMode.getIntValue()).apply();
     }
 
     private void saveModeActivated() {
@@ -155,14 +162,5 @@ public class WorkModeService {
                 .putInt(WORK_START_TIME_KEY, workStartTime.getMillisOfDay())
                 .putInt(WORK_END_TIME_KEY, workEndTime.getMillisOfDay())
                 .apply();
-    }
-
-    private void setRingerModeToSilentCompletely() {
-        try {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            Thread.sleep(1000);
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        } catch (InterruptedException e) {
-        }
     }
 }

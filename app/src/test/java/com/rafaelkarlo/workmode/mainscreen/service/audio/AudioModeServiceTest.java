@@ -91,7 +91,13 @@ public class AudioModeServiceTest {
 
         verify(sharedPreferencesEditor).putInt(PREVIOUS_RINGER_MODE_KEY, NORMAL.getIntValue());
         verify(sharedPreferencesEditor).apply();
+    }
 
+    @Test
+    public void shouldGetPreviousAudioMode() {
+        when(sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, -1)).thenReturn(NORMAL.getIntValue());
+
+        assertThat(audioModeService.getPreviouslySavedMode()).isEqualTo(NORMAL);
     }
 
 }

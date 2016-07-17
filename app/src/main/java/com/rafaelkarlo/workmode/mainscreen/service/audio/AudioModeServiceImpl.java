@@ -65,6 +65,11 @@ public class AudioModeServiceImpl implements AudioModeService {
         return transformToAudioMode(audioManager.getRingerMode());
     }
 
+    @Override
+    public AudioMode getPreviouslySavedMode() {
+        return transformToAudioMode(sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, -1));
+    }
+
     private final Observable<Void> setSilentModeTask = Observable.create(new Observable.OnSubscribe<Void>() {
         @Override
         public void call(Subscriber<? super Void> subscriber) {

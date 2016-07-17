@@ -2,7 +2,6 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 
 
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
 
@@ -19,7 +18,6 @@ import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.VIBRATE;
 import static org.joda.time.DateTimeUtils.setCurrentMillisFixed;
 import static org.joda.time.DateTimeUtils.setCurrentMillisSystem;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -31,7 +29,6 @@ public class WorkModeServiceTest {
     public static final LocalTime START_WORK_TIME = new LocalTime(9, 0, 0);
     private static final LocalTime END_WORK_TIME = new LocalTime(17, 0, 0);
     public static final String WORK_MODE_ACTIVATED_KEY = "WORK_MODE_ACTIVATED";
-    private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
     private WorkModeService workModeService;
 
     @Mock
@@ -73,7 +70,6 @@ public class WorkModeServiceTest {
         setWorkModeToActivatedMode();
         setCurrentTime(START_WORK_TIME);
         when(audioModeService.getCurrentMode()).thenReturn(SILENT);
-        setupMockForSavingPreviousMode();
 
         assertThat(workModeService.setToSilentMode()).isTrue();
 
@@ -102,7 +98,7 @@ public class WorkModeServiceTest {
     @Test
     public void shouldSetToNormalModeAfterWorkHours() {
         setWorkModeToActivatedMode();
-        setWorkEndTime();
+        when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
         when(audioModeService.getCurrentMode()).thenReturn(NORMAL);
 
         setCurrentTime(END_WORK_TIME);
@@ -114,7 +110,7 @@ public class WorkModeServiceTest {
 
     @Test
     public void shouldNotSetToNormalModeBeforeEndOfWorkHours() {
-        setWorkEndTime();
+        when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
 
         setCurrentTime(END_WORK_TIME.minusMinutes(1));
 
@@ -162,21 +158,8 @@ public class WorkModeServiceTest {
         workModeService.setToSilentMode();
     }
 
-    private void setupMockForSavingPreviousMode() {
-        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_SILENT)).thenReturn(sharedPreferencesEditor);
-    }
-
     private void setWorkHours() {
-        setWorkStartTime();
-        setWorkEndTime();
-    }
-
-    private void setWorkStartTime() {
         when(workTimeService.getStartWorkTime()).thenReturn((START_WORK_TIME));
-    }
-
-    private void setWorkEndTime() {
         when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
     }
 

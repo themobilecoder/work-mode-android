@@ -55,7 +55,7 @@ public class MainActivityModule {
     @Provides
     @Singleton
     public AudioModeServiceImpl provideAudioModeService() {
-        return new AudioModeServiceImpl(provideAudioManager());
+        return new AudioModeServiceImpl(provideAudioManager(), provideSharedPreferences());
     }
 
     @Provides

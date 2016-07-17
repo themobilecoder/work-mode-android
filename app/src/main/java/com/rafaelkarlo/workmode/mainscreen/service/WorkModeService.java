@@ -8,9 +8,6 @@ import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
-import static android.media.AudioManager.RINGER_MODE_NORMAL;
-import static android.media.AudioManager.RINGER_MODE_SILENT;
-import static android.media.AudioManager.RINGER_MODE_VIBRATE;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.NORMAL;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT;
 import static org.joda.time.DateTime.now;
@@ -18,7 +15,6 @@ import static org.joda.time.DateTime.now;
 public class WorkModeService {
 
     private static final String WORK_MODE_ACTIVATED = "WORK_MODE_ACTIVATED";
-    private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
 
     private AudioModeService audioModeService;
     private WorkTimeService workTimeService;
@@ -82,23 +78,8 @@ public class WorkModeService {
     }
 
     private AudioMode getPreviousRingerMode() {
-
-        return transformToAudioMode(sharedPreferences.getInt(PREVIOUS_RINGER_MODE_KEY, -1));
+        return audioModeService.getCurrentMode();
     }
-
-    private AudioMode transformToAudioMode(int audioModeInInt) {
-        switch (audioModeInInt) {
-            case RINGER_MODE_NORMAL:
-                return AudioMode.NORMAL;
-            case RINGER_MODE_VIBRATE:
-                return AudioMode.VIBRATE;
-            case RINGER_MODE_SILENT:
-                return AudioMode.SILENT;
-            default:
-                return AudioMode.UNKNOWN;
-        }
-    }
-
 
     private boolean canSetToSilentMode() {
         return nowIsWithinWorkHours() && isActivated();
@@ -122,8 +103,7 @@ public class WorkModeService {
     }
 
     private void saveCurrentRingerMode() {
-        AudioMode currentRingerMode = audioModeService.getCurrentMode();
-        sharedPreferences.edit().putInt(PREVIOUS_RINGER_MODE_KEY, currentRingerMode.getIntValue()).apply();
+        audioModeService.saveCurrentRingerMode(audioModeService.getCurrentMode());
     }
 
     private void saveModeActivated() {

@@ -1,5 +1,6 @@
 package com.rafaelkarlo.workmode.mainscreen.service.audio;
 
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 
 import javax.inject.Inject;
@@ -15,11 +16,15 @@ import static rx.schedulers.Schedulers.io;
 
 public class AudioModeServiceImpl implements AudioModeService {
 
+    private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
+
     private AudioManager audioManager;
+    private SharedPreferences sharedPreferences;
 
     @Inject
-    public AudioModeServiceImpl(AudioManager audioManager) {
+    public AudioModeServiceImpl(AudioManager audioManager, SharedPreferences sharedPreferences) {
         this.audioManager = audioManager;
+        this.sharedPreferences = sharedPreferences;
     }
 
     @Override
@@ -46,6 +51,13 @@ public class AudioModeServiceImpl implements AudioModeService {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void saveCurrentRingerMode(AudioMode audioMode) {
+        sharedPreferences.edit()
+                .putInt(PREVIOUS_RINGER_MODE_KEY, audioMode.getIntValue())
+                .apply();
     }
 
     @Override

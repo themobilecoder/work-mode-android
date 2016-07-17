@@ -31,13 +31,14 @@ public class WorkModeServiceTest {
     public static final LocalTime START_WORK_TIME = new LocalTime(9, 0, 0);
     private static final LocalTime END_WORK_TIME = new LocalTime(17, 0, 0);
     public static final String WORK_MODE_ACTIVATED_KEY = "WORK_MODE_ACTIVATED";
-    public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
-    public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
     private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
     private WorkModeService workModeService;
 
     @Mock
     AudioModeService audioModeService;
+
+    @Mock
+    WorkTimeService workTimeService;
 
     @Mock
     SharedPreferences sharedPreferences;
@@ -47,7 +48,7 @@ public class WorkModeServiceTest {
 
     @Before
     public void setup() {
-        workModeService = new WorkModeService(audioModeService, sharedPreferences);
+        workModeService = new WorkModeService(audioModeService, workTimeService, sharedPreferences);
         resetToPresent();
     }
 
@@ -81,7 +82,7 @@ public class WorkModeServiceTest {
 
     @Test
     public void shouldNotSetToSilentModeWhenBeforeWorkHours() {
-        setWorkStartTime();
+        setWorkHours();
         setCurrentTime(START_WORK_TIME.minusMinutes(1));
 
         assertThat(workModeService.setToSilentMode()).isFalse();
@@ -91,7 +92,7 @@ public class WorkModeServiceTest {
 
     @Test
     public void shouldNotSetToSilentModeAfterWorkHours() {
-        setWorkEndTime();
+        setWorkHours();
         setCurrentTime(END_WORK_TIME.plusMinutes(1));
 
         assertThat(workModeService.setToSilentMode()).isFalse();
@@ -127,7 +128,6 @@ public class WorkModeServiceTest {
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         when(sharedPreferencesEditor.putBoolean(WORK_MODE_ACTIVATED_KEY, true)).thenReturn(sharedPreferencesEditor);
         when(audioModeService.getCurrentMode()).thenReturn(VIBRATE);
-        when(sharedPreferencesEditor.putInt(PREVIOUS_RINGER_MODE_KEY, AudioManager.RINGER_MODE_VIBRATE)).thenReturn(sharedPreferencesEditor);
         setWorkModeToActivatedMode();
 
         workModeService.activate();
@@ -157,39 +157,9 @@ public class WorkModeServiceTest {
     }
 
     @Test
-    public void shouldPersistWorkHours() {
-        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferencesEditor.putInt(WORK_START_TIME_KEY, START_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferencesEditor.putInt(WORK_END_TIME_KEY, END_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
-
-        workModeService.setWorkHours(START_WORK_TIME, END_WORK_TIME);
-
-        verify(sharedPreferences).edit();
-        verify(sharedPreferencesEditor).putInt(WORK_START_TIME_KEY, START_WORK_TIME.getMillisOfDay());
-        verify(sharedPreferencesEditor).putInt(WORK_END_TIME_KEY, END_WORK_TIME.getMillisOfDay());
-        verify(sharedPreferencesEditor).apply();
-    }
-
-    @Test
     public void shouldPersistCurrentModeWhenSettingTheMode() {
-
-
+        setWorkHours();
         workModeService.setToSilentMode();
-    }
-
-    @Test
-    public void shouldNotAllowStartOfWorkTimeAfterTheEndOfWorkTime() {
-        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferencesEditor.putInt(WORK_START_TIME_KEY, END_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
-        when(sharedPreferencesEditor.putInt(WORK_END_TIME_KEY, START_WORK_TIME.getMillisOfDay())).thenReturn(sharedPreferencesEditor);
-
-        try {
-            workModeService.setWorkHours(END_WORK_TIME, START_WORK_TIME);
-            fail("Should throw an illegal argument exception");
-        } catch (IllegalArgumentException exception) {
-            //Ignore Exception
-        }
-
     }
 
     private void setupMockForSavingPreviousMode() {
@@ -203,11 +173,11 @@ public class WorkModeServiceTest {
     }
 
     private void setWorkStartTime() {
-        when(sharedPreferences.getInt(WORK_START_TIME_KEY, 0)).thenReturn((START_WORK_TIME.getMillisOfDay()));
+        when(workTimeService.getStartWorkTime()).thenReturn((START_WORK_TIME));
     }
 
     private void setWorkEndTime() {
-        when(sharedPreferences.getInt(WORK_END_TIME_KEY, 0)).thenReturn((END_WORK_TIME.getMillisOfDay()));
+        when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
     }
 
     private void setWorkModeToActivatedMode() {

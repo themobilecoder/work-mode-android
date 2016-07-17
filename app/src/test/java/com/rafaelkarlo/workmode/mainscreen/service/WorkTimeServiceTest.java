@@ -1,0 +1,94 @@
+package com.rafaelkarlo.workmode.mainscreen.service;
+
+import android.content.SharedPreferences;
+
+import org.joda.time.LocalTime;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
+public class WorkTimeServiceTest {
+    public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
+    public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
+
+    @Mock
+    private SharedPreferences sharedPreferences;
+
+    @Mock
+    private SharedPreferences.Editor sharedPreferencesEditor;
+
+    private WorkTimeService workTimeService;
+
+    private LocalTime expectedStartTime = new LocalTime(9, 0, 0);
+    private LocalTime expectedEndTime = new LocalTime(17, 0, 0);
+
+    @Before
+    public void setup() {
+        workTimeService = new WorkTimeServiceImpl(sharedPreferences);
+    }
+
+    @Test
+    public void shouldSaveStartOfWorkTime() {
+        setupMockForSavingStartTime();
+
+        workTimeService.setStartWorkTime(expectedStartTime);
+
+        verify(sharedPreferencesEditor).putInt(WORK_START_TIME_KEY, expectedStartTime.getMillisOfDay());
+    }
+
+    @Test
+    public void shouldSaveEndOfWorkTime() {
+        setupMockForSavingEndTime();
+
+        workTimeService.setEndWorkTime(expectedEndTime);
+
+        verify(sharedPreferencesEditor).putInt(WORK_END_TIME_KEY, expectedEndTime.getMillisOfDay());
+    }
+
+    @Test
+    public void shouldGetSavedStartTime() {
+        when(sharedPreferences.getInt(WORK_START_TIME_KEY, -1)).thenReturn(expectedStartTime.getMillisOfDay());
+
+        assertThat(workTimeService.getStartWorkTime()).isEqualTo(expectedStartTime);
+    }
+
+    @Test
+    public void shouldGetSavedendTime() {
+        when(sharedPreferences.getInt(WORK_END_TIME_KEY, -1)).thenReturn(expectedEndTime.getMillisOfDay());
+
+        assertThat(workTimeService.getEndWorkTime()).isEqualTo(expectedEndTime);
+    }
+
+    @Test
+    public void shouldReturnNullIfThereAreNoSavedWorkTimes() {
+        when(sharedPreferences.getInt(WORK_START_TIME_KEY, -1)).thenReturn(-1);
+        when(sharedPreferences.getInt(WORK_END_TIME_KEY, -1)).thenReturn(-1);
+
+        assertThat(workTimeService.getStartWorkTime()).isNull();
+        assertThat(workTimeService.getEndWorkTime()).isNull();
+    }
+
+    private void setupMockForSavingStartTime() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        int millisOfStartTimeToday = expectedStartTime.getMillisOfDay();
+        when(sharedPreferencesEditor.putInt(WORK_START_TIME_KEY, millisOfStartTimeToday)).thenReturn(sharedPreferencesEditor);
+    }
+
+    private void setupMockForSavingEndTime() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        int millisOfEndTimeToday = expectedEndTime.getMillisOfDay();
+        when(sharedPreferencesEditor.putInt(WORK_END_TIME_KEY, millisOfEndTimeToday)).thenReturn(sharedPreferencesEditor);
+    }
+
+
+
+
+
+}

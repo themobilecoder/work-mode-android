@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.preference.PreferenceManager;
 
 import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
+import com.rafaelkarlo.workmode.mainscreen.service.WorkTimeServiceImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmReceiver;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
@@ -59,8 +60,14 @@ public class MainActivityModule {
 
     @Provides
     @Singleton
+    public WorkTimeServiceImpl provideWorkTimeService() {
+        return new WorkTimeServiceImpl(provideSharedPreferences());
+    }
+
+    @Provides
+    @Singleton
     public WorkModeService provideWorkModeService() {
-        return new WorkModeService(provideAudioModeService(), provideSharedPreferences());
+        return new WorkModeService(provideAudioModeService(), provideWorkTimeService(), provideSharedPreferences());
     }
 
     @Provides

@@ -18,15 +18,15 @@ import static org.joda.time.DateTime.now;
 public class WorkModeService {
 
     private static final String WORK_MODE_ACTIVATED = "WORK_MODE_ACTIVATED";
-    public static final String WORK_START_TIME_KEY = "WORK_START_TIME";
-    public static final String WORK_END_TIME_KEY = "WORK_END_TIME";
     private static final String PREVIOUS_RINGER_MODE_KEY = "PREVIOUS_RINGER_MODE";
 
     private AudioModeService audioModeService;
+    private WorkTimeService workTimeService;
     private SharedPreferences sharedPreferences;
 
-    public WorkModeService(AudioModeService audioModeService, SharedPreferences sharedPreferences) {
+    public WorkModeService(AudioModeService audioModeService, WorkTimeService workTimeService, SharedPreferences sharedPreferences) {
         this.audioModeService = audioModeService;
+        this.workTimeService = workTimeService;
         this.sharedPreferences = sharedPreferences;
     }
 
@@ -65,39 +65,20 @@ public class WorkModeService {
         return sharedPreferences.getBoolean(WORK_MODE_ACTIVATED, false);
     }
 
-    public void setWorkHours(LocalTime workStartTime, LocalTime workEndTime) {
-        if (workStartTime.isAfter(workEndTime)) {
-            throw new IllegalArgumentException("Work start time should be before the work end time");
-        }
-        saveWorkHoursToSharedPreferences(workStartTime, workEndTime);
-    }
-
     public void setStartTime(LocalTime workStartTime) {
-        sharedPreferences.edit()
-                .putInt(WORK_START_TIME_KEY, workStartTime.getMillisOfDay())
-                .apply();
+        workTimeService.setStartWorkTime(workStartTime);
     }
 
     public void setEndTime(LocalTime workEndTime) {
-        sharedPreferences.edit()
-                .putInt(WORK_END_TIME_KEY, workEndTime.getMillisOfDay())
-                .apply();
+        workTimeService.setEndWorkTime(workEndTime);
     }
 
     public LocalTime getStartTime() {
-        int timeInMillis = sharedPreferences.getInt(WORK_START_TIME_KEY, -1);
-        if (timeInMillis == -1) {
-            return null;
-        }
-        return LocalTime.fromMillisOfDay(timeInMillis);
+        return workTimeService.getStartWorkTime();
     }
 
     public LocalTime getEndTime() {
-        int timeInMillis = sharedPreferences.getInt(WORK_END_TIME_KEY, -1);
-        if (timeInMillis == -1) {
-            return null;
-        }
-        return LocalTime.fromMillisOfDay(timeInMillis);
+        return workTimeService.getEndWorkTime();
     }
 
     private AudioMode getPreviousRingerMode() {
@@ -128,15 +109,15 @@ public class WorkModeService {
     }
 
     private boolean nowIsWithinWorkHours() {
-        int startTimeInSecondsOfDay = sharedPreferences.getInt(WORK_START_TIME_KEY, 0);
-        int endTimeInSecondsOfDay = sharedPreferences.getInt(WORK_END_TIME_KEY, 0);
+        int startTimeInSecondsOfDay = workTimeService.getStartWorkTime().getMillisOfDay();
+        int endTimeInSecondsOfDay = workTimeService.getEndWorkTime().getMillisOfDay();
         DateTime now = now();
 
         return startTimeInSecondsOfDay <= now.getMillisOfDay() && now.getMillisOfDay() <= endTimeInSecondsOfDay;
     }
 
     private boolean nowIsAfterWorkHours() {
-        int endTimeInSecondsOfDay = sharedPreferences.getInt(WORK_END_TIME_KEY, 0);
+        int endTimeInSecondsOfDay = workTimeService.getEndWorkTime().getMillisOfDay();
         return now().getMillisOfDay() >= endTimeInSecondsOfDay;
     }
 
@@ -155,12 +136,5 @@ public class WorkModeService {
 
     private void saveModeInSharedPreferences(boolean activated) {
         sharedPreferences.edit().putBoolean(WORK_MODE_ACTIVATED, activated).apply();
-    }
-
-    private void saveWorkHoursToSharedPreferences(LocalTime workStartTime, LocalTime workEndTime) {
-        sharedPreferences.edit()
-                .putInt(WORK_START_TIME_KEY, workStartTime.getMillisOfDay())
-                .putInt(WORK_END_TIME_KEY, workEndTime.getMillisOfDay())
-                .apply();
     }
 }

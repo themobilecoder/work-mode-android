@@ -2,6 +2,9 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 
 import android.content.SharedPreferences;
 
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeServiceImpl;
+
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;

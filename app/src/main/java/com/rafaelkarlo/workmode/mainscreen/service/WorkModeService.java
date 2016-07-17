@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode;
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;

@@ -4,6 +4,7 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 import android.content.SharedPreferences;
 
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
 
 import org.joda.time.LocalTime;
 import org.junit.Before;

@@ -8,7 +8,7 @@ import android.media.AudioManager;
 import android.preference.PreferenceManager;
 
 import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
-import com.rafaelkarlo.workmode.mainscreen.service.WorkTimeServiceImpl;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeServiceImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmReceiver;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;

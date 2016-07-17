@@ -7,4 +7,6 @@
     <color name="green">#388E3C</color>
     <color name="errorBackground">#B71C1C</color>
     <color name="successfulBackground">#1B5E20</color>
+    <color name="colorChecked">#EF5350</color>
+    <color name="colorUnchecked">#FAFAFA</color>
 </resources>

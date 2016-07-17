@@ -3,8 +3,10 @@ package com.rafaelkarlo.workmode.mainscreen.view;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
 
     @BindView(R.id.set_end_time_button)
     ImageView endTimeButton;
+
+    @BindView(R.id.set_days_button)
+    ImageView setDaysButton;
 
     @BindView(R.id.work_start_time_value)
     TextView workStartTimeText;
@@ -133,6 +138,19 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @OnClick(R.id.set_end_time_button)
     public void setEndTime(View button) {
         showTimePickerDialog("endTime");
+    }
+
+    @OnClick(R.id.set_days_button)
+    public void setDays(View button) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.day_picker_dialog, null);
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setTitle("Work Days");
+        dialogBuilder.setPositiveButton("Save", null);
+        dialogBuilder.setNegativeButton("Cancel", null);
+
+        dialogBuilder.create().show();
     }
 
     private void setViewToDeactivated() {

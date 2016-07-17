@@ -25,7 +25,7 @@
                 android:id="@+id/work_mode_status_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="130dp"
+                android:layout_marginEnd="60dp"
                 android:text="@string/work_mode_status_text"
                 android:textSize="18sp" />
 
@@ -58,7 +58,7 @@
                 android:id="@+id/work_start_time_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="99dp"
+                android:layout_marginEnd="29dp"
                 android:text="Start Time"
                 android:textSize="18sp" />
 
@@ -71,7 +71,7 @@
                 android:text="--"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                tools:text="--" />
+                tools:text="7:00 AM" />
 
             <ImageView
                 android:id="@+id/set_start_time_button"
@@ -86,7 +86,8 @@
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -97,7 +98,7 @@
                 android:id="@+id/work_end_time_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="100dp"
+                android:layout_marginEnd="30dp"
                 android:text="Stop Time"
                 android:textSize="18sp" />
 
@@ -110,7 +111,7 @@
                 android:text="--"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                tools:text="--" />
+                tools:text="12:30 PM" />
 
             <ImageView
                 android:id="@+id/set_end_time_button"
@@ -118,6 +119,46 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_time_24dp"
+                android:tint="#455A64" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/work_days_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="26dp"
+                android:text="Work Days"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/work_days_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/work_days_label"
+                android:gravity="center"
+                android:text="Monday to Friday"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Monday to Friday" />
+
+            <ImageView
+                android:id="@+id/set_days_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_set_days_24dp"
                 android:tint="#455A64" />
 
         </RelativeLayout>

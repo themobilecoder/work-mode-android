@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <ToggleButton
+        android:id="@+id/sunday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="false"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="S"
+        android:textOn="S" />
+
+    <ToggleButton
+        android:id="@+id/monday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="true"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="M"
+        android:textOn="M" />
+
+    <ToggleButton
+        android:id="@+id/tuesday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="true"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="T"
+        android:textOn="T" />
+
+    <ToggleButton
+        android:id="@+id/wednesday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="true"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="W"
+        android:textOn="W" />
+
+    <ToggleButton
+        android:id="@+id/thursday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="true"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="Th"
+        android:textOn="Th" />
+
+    <ToggleButton
+        android:id="@+id/friday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="true"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="F"
+        android:textOn="F" />
+
+    <ToggleButton
+        android:id="@+id/saturday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="false"
+        android:background="@drawable/day_toggle_button"
+        android:textOff="S"
+        android:textOn="S" />
+
+
+</LinearLayout>

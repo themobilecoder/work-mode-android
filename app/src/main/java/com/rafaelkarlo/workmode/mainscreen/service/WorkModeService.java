@@ -79,7 +79,7 @@ public class WorkModeService {
     }
 
     private AudioMode getPreviousRingerMode() {
-        return audioModeService.getCurrentMode();
+        return audioModeService.getPreviouslySavedMode();
     }
 
     private boolean canSetToSilentMode() {
@@ -91,15 +91,19 @@ public class WorkModeService {
     }
 
     private boolean nowIsWithinWorkHours() {
-        int startTimeInSecondsOfDay = workTimeService.getStartWorkTime().getMillisOfDay();
-        int endTimeInSecondsOfDay = workTimeService.getEndWorkTime().getMillisOfDay();
+        LocalTime startWorkTime = workTimeService.getStartWorkTime();
+        LocalTime endWorkTime = workTimeService.getEndWorkTime();
+        int startTimeInSecondsOfDay = startWorkTime == null ? -1 : startWorkTime.getMillisOfDay();
+        int endTimeInSecondsOfDay = endWorkTime == null ? -1 : endWorkTime.getMillisOfDay();
         DateTime now = now();
 
         return startTimeInSecondsOfDay <= now.getMillisOfDay() && now.getMillisOfDay() <= endTimeInSecondsOfDay;
     }
 
     private boolean nowIsAfterWorkHours() {
-        int endTimeInSecondsOfDay = workTimeService.getEndWorkTime().getMillisOfDay();
+        LocalTime endWorkTime = workTimeService.getEndWorkTime();
+        int endTimeInSecondsOfDay = endWorkTime == null ? -1 : endWorkTime.getMillisOfDay();
+
         return now().getMillisOfDay() >= endTimeInSecondsOfDay;
     }
 

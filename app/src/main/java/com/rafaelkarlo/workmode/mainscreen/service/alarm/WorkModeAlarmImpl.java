@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import java.util.Calendar;
@@ -15,7 +14,11 @@ import javax.inject.Inject;
 
 import static android.app.AlarmManager.INTERVAL_DAY;
 import static android.app.AlarmManager.RTC_WAKEUP;
-import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.*;
+import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.ONE_DAY_IN_MILLIS;
+import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.WORK_END_ACTION;
+import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.WORK_START_ACTION;
+import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.createIntentWithIdentifierAndTime;
+import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.createPendingIntentWithIntent;
 import static org.joda.time.LocalTime.now;
 
 public class WorkModeAlarmImpl implements WorkModeAlarm {
@@ -32,10 +35,10 @@ public class WorkModeAlarmImpl implements WorkModeAlarm {
 
     @Override
     public void startAlarm(LocalTime workStartTime, LocalTime workEndTime) {
-        if (now().isBefore(workEndTime)) {
-            setDailyAlarmStartingToday(workStartTime, workEndTime);
+        if (workStartTime.isBefore(workEndTime)) {
+            setAlarmForNormalShift(workStartTime, workEndTime);
         } else {
-            setDailyAlarmStartingTomorrow(workStartTime, workEndTime);
+            setAlarmForNightShift(workStartTime, workEndTime);
         }
     }
 
@@ -45,31 +48,93 @@ public class WorkModeAlarmImpl implements WorkModeAlarm {
         alarmManager.cancel(createPendingIntentWithIntent(context, createIntentWithIdentifierAndTime(context, WORK_END_ACTION, 0)));
     }
 
-    private void setDailyAlarmStartingTomorrow(LocalTime workStartTime, LocalTime workEndTime) {
-        setDailyAlarmForAnAction(workStartTime, WORK_START_ACTION, false);
-        setDailyAlarmForAnAction(workEndTime, WORK_END_ACTION, false);
+    private void setAlarmForNormalShift(LocalTime workStartTime, LocalTime workEndTime) {
+        LocalTime currentTime = now();
+        if (currentTime.isBefore(workEndTime)) {
+            setDailyAlarmStartingToday(workStartTime, workEndTime);
+        } else {
+            setDailyAlarmStartingTomorrow(workStartTime, workEndTime);
+        }
+    }
+
+    private void setAlarmForNightShift(LocalTime workStartTime, LocalTime workEndTime) {
+        LocalTime currentTime = now();
+
+        if (currentTime.isBefore(workEndTime)) {
+            setDailyAlarmForMidnightStartingYesterday(workStartTime, workEndTime);
+        } else {
+            setDailyAlarmForMidnightStartingToday(workStartTime, workEndTime);
+        }
     }
 
     private void setDailyAlarmStartingToday(LocalTime workStartTime, LocalTime workEndTime) {
-        setDailyAlarmForAnAction(workStartTime, WORK_START_ACTION, true);
-        setDailyAlarmForAnAction(workEndTime, WORK_END_ACTION, true);
+        setDailyAlarmForAnAction(workStartTime, WORK_START_ACTION, TriggerDay.TODAY);
+        setDailyAlarmForAnAction(workEndTime, WORK_END_ACTION, TriggerDay.TODAY);
     }
 
-    private void setDailyAlarmForAnAction(LocalTime triggerTime, String actionIdentifier, boolean triggerNow) {
+    private void setDailyAlarmStartingTomorrow(LocalTime workStartTime, LocalTime workEndTime) {
+        setDailyAlarmForAnAction(workStartTime, WORK_START_ACTION, TriggerDay.TOMORROW);
+        setDailyAlarmForAnAction(workEndTime, WORK_END_ACTION, TriggerDay.TOMORROW);
+    }
+
+    private void setDailyAlarmForMidnightStartingYesterday(LocalTime workStartTime, LocalTime workEndTime) {
+        setDailyAlarmForAnAction(workStartTime, WORK_START_ACTION, TriggerDay.YESTERDAY);
+        setDailyAlarmForAnAction(workEndTime, WORK_END_ACTION, TriggerDay.TODAY);
+    }
+
+    private void setDailyAlarmForMidnightStartingToday(LocalTime workStartTime, LocalTime workEndTime) {
+        setDailyAlarmForAnAction(workStartTime, WORK_START_ACTION, TriggerDay.TODAY);
+        setDailyAlarmForAnAction(workEndTime, WORK_END_ACTION, TriggerDay.TOMORROW);
+    }
+
+    private void setDailyAlarmForAnAction(LocalTime triggerTime, String actionIdentifier, TriggerDay triggerDay) {
         long timeInMillis = getTimeInMillisFromLocalTime(triggerTime);
         Intent workStartIntent = createIntentWithIdentifierAndTime(context, actionIdentifier, timeInMillis);
 
         int sdkVersion = Build.VERSION.SDK_INT;
         if (sdkVersion >= Build.VERSION_CODES.KITKAT) {
-            setAlarmForApi19AndAbove(timeInMillis, workStartIntent, triggerNow);
+            switch (triggerDay) {
+                case YESTERDAY:
+                    setAlarmYesterdayForApi19AndAbove(timeInMillis, workStartIntent);
+                    break;
+                case TODAY:
+                    setAlarmForApi19AndAbove(timeInMillis, workStartIntent);
+                    break;
+                case TOMORROW:
+                    setAlarmTomorrowForApi19AndAbove(timeInMillis, workStartIntent);
+                    break;
+                default:
+                    break;
+            }
         } else {
-            setAlarmForApiBelow19(timeInMillis, workStartIntent, triggerNow);
+            switch (triggerDay) {
+                case YESTERDAY:
+                    setAlarmYesterdayForApiBelow19(timeInMillis, workStartIntent);
+                    break;
+                case TODAY:
+                    setAlarmForApiBelow19(timeInMillis, workStartIntent);
+                    break;
+                case TOMORROW:
+                    setAlarmTomorrowForApiBelow19(timeInMillis, workStartIntent);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void setAlarmForApi19AndAbove(long triggerTimeInMillis, Intent workStartIntent, boolean triggerNow) {
-        triggerTimeInMillis = triggerNow ? triggerTimeInMillis : getTomorrowsTriggerTimeInMillis(triggerTimeInMillis);
+    private void setAlarmTomorrowForApi19AndAbove(long triggerTimeInMillis, Intent workStartIntent) {
+        setAlarmForApi19AndAbove(getTomorrowsTriggerTimeInMillis(triggerTimeInMillis), workStartIntent);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void setAlarmYesterdayForApi19AndAbove(long triggerTimeInMillis, Intent workStartIntent) {
+        setAlarmForApi19AndAbove(getYesterdaysTriggerTimeInMillis(triggerTimeInMillis), workStartIntent);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void setAlarmForApi19AndAbove(long triggerTimeInMillis, Intent workStartIntent) {
         alarmManager.setExact(
                 RTC_WAKEUP,
                 triggerTimeInMillis,
@@ -77,8 +142,16 @@ public class WorkModeAlarmImpl implements WorkModeAlarm {
         );
     }
 
-    private void setAlarmForApiBelow19(long triggerTimeInMillis, Intent workStartIntent, boolean triggerNow) {
-        triggerTimeInMillis = triggerNow ? triggerTimeInMillis : getTomorrowsTriggerTimeInMillis(triggerTimeInMillis);
+    private void setAlarmTomorrowForApiBelow19(long triggerTimeInMillis, Intent workStartIntent) {
+        setAlarmForApiBelow19(getTomorrowsTriggerTimeInMillis(triggerTimeInMillis), workStartIntent);
+    }
+
+    private void setAlarmYesterdayForApiBelow19(long triggerTimeInMillis, Intent workStartIntent) {
+        setAlarmForApiBelow19(getYesterdaysTriggerTimeInMillis(triggerTimeInMillis), workStartIntent);
+
+    }
+
+    private void setAlarmForApiBelow19(long triggerTimeInMillis, Intent workStartIntent) {
         alarmManager.setRepeating(
                 RTC_WAKEUP,
                 triggerTimeInMillis,
@@ -94,10 +167,16 @@ public class WorkModeAlarmImpl implements WorkModeAlarm {
     }
 
     private long getTomorrowsTriggerTimeInMillis(long triggerTimeInMillis) {
-        int triggerTimeInMillisOfDay = new DateTime(triggerTimeInMillis).getMillisOfDay();
-        if (triggerTimeInMillisOfDay < now().getMillisOfDay()) {
-            triggerTimeInMillis = triggerTimeInMillis + ONE_DAY_IN_MILLIS;
-        }
-        return triggerTimeInMillis;
+        return triggerTimeInMillis + ONE_DAY_IN_MILLIS;
+    }
+
+    private long getYesterdaysTriggerTimeInMillis(long triggerTimeInMillis) {
+        return triggerTimeInMillis - ONE_DAY_IN_MILLIS;
+    }
+
+    private enum TriggerDay {
+        YESTERDAY,
+        TODAY,
+        TOMORROW
     }
 }

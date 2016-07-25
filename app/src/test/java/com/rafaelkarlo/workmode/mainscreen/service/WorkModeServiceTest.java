@@ -88,6 +88,38 @@ public class WorkModeServiceTest {
     }
 
     @Test
+    public void shouldSetToSilentDuringWorkHoursOnANightShiftBeforeMidnight() {
+        LocalTime eveningStartWorkTime = new LocalTime(20, 0);
+        LocalTime morningEndWorkTime = new LocalTime(4, 0);
+        when(workTimeService.getStartWorkTime()).thenReturn(eveningStartWorkTime);
+        when(workTimeService.getEndWorkTime()).thenReturn(morningEndWorkTime);
+        setWorkModeToActivatedMode();
+
+        LocalTime currentTimeBeforeMidnight = eveningStartWorkTime.plusMinutes(1);
+        setCurrentTime(currentTimeBeforeMidnight);
+
+        assertThat(workModeService.setToSilentMode()).isTrue();
+
+        verify(audioModeService).setModeTo(SILENT);
+    }
+
+    @Test
+    public void shouldSetToSilentDuringWorkHoursOnANightShiftAfterMidnight() {
+        LocalTime eveningStartWorkTime = new LocalTime(20, 0);
+        LocalTime morningEndWorkTime = new LocalTime(4, 0);
+        when(workTimeService.getStartWorkTime()).thenReturn(eveningStartWorkTime);
+        when(workTimeService.getEndWorkTime()).thenReturn(morningEndWorkTime);
+        setWorkModeToActivatedMode();
+
+        LocalTime currentTimeAfterMidnight = new LocalTime(1, 0, 0);
+        setCurrentTime(currentTimeAfterMidnight);
+
+        assertThat(workModeService.setToSilentMode()).isTrue();
+
+        verify(audioModeService).setModeTo(SILENT);
+    }
+
+    @Test
     public void shouldNotSetToSilentModeAfterWorkHours() {
         setWorkHours();
         setCurrentTime(END_WORK_TIME.plusMinutes(1));

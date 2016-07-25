@@ -1,7 +1,7 @@
 package com.rafaelkarlo.workmode.mainscreen.presenter;
 
-import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
+import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 
 import org.joda.time.LocalTime;
@@ -11,11 +11,22 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
+
+import static java.lang.String.format;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static rx.Observable.just;
+import static rx.Observable.merge;
+import static rx.schedulers.Schedulers.io;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MainPresenterTest {
@@ -104,9 +115,22 @@ public class MainPresenterTest {
     }
 
     @Test
-    public void shouldNotBeAllowedToActivateWhenStartTimeIsLaterThanEndTime() {
+    public void shouldBeAllowedToActivateWhenStartTimeIsLaterThanEndTime() {
         LocalTime afternoonTime = new LocalTime(17, 0);
         LocalTime morningTime = new LocalTime(9, 0);
+        when(workModeService.getStartTime()).thenReturn(afternoonTime);
+        when(workModeService.getEndTime()).thenReturn(morningTime);
+
+        mainPresenter.activateWorkMode();
+
+        verify(mainView).onWorkModeActivation();
+        verify(mainView).displayActivationSuccessful();
+    }
+
+    @Test
+    public void shouldNotBeAllowedToActivateWhenStartTimeIsLEqualToEndTime() {
+        LocalTime afternoonTime = new LocalTime(17, 0);
+        LocalTime morningTime = new LocalTime(17, 0);
         when(workModeService.getStartTime()).thenReturn(afternoonTime);
         when(workModeService.getEndTime()).thenReturn(morningTime);
 

@@ -93,11 +93,35 @@ public class WorkModeService {
     private boolean nowIsWithinWorkHours() {
         LocalTime startWorkTime = workTimeService.getStartWorkTime();
         LocalTime endWorkTime = workTimeService.getEndWorkTime();
-        int startTimeInSecondsOfDay = startWorkTime == null ? -1 : startWorkTime.getMillisOfDay();
-        int endTimeInSecondsOfDay = endWorkTime == null ? -1 : endWorkTime.getMillisOfDay();
-        DateTime now = now();
+        int startTimeInMillisOfDay = startWorkTime == null ? -1 : startWorkTime.getMillisOfDay();
+        int endTimeInMillisOfDay = endWorkTime == null ? -1 : endWorkTime.getMillisOfDay();
+        int nowInMillisOfDay = now().getMillisOfDay();
 
-        return startTimeInSecondsOfDay <= now.getMillisOfDay() && now.getMillisOfDay() <= endTimeInSecondsOfDay;
+        if (endTimeInMillisOfDay < startTimeInMillisOfDay) {
+            return isNowBetweenStartAndEndDuringNightShift(startTimeInMillisOfDay,
+                    endTimeInMillisOfDay,
+                    nowInMillisOfDay);
+         } else {
+            return startTimeInMillisOfDay <= nowInMillisOfDay
+                    && nowInMillisOfDay <= endTimeInMillisOfDay;
+        }
+    }
+
+    private boolean isNowBetweenStartAndEndDuringNightShift(int startTimeInSecondsOfDay, int endTimeInSecondsOfDay, int nowInMillisOfDay) {
+        return isNowAfterStartOfWorkhoursBeforeMidnight(startTimeInSecondsOfDay, nowInMillisOfDay)
+                || isNowAfterMidnightBeforeEndOfWorkHours(nowInMillisOfDay, endTimeInSecondsOfDay);
+    }
+
+    private boolean isNowAfterMidnightBeforeEndOfWorkHours(int nowInMillisOfDay,
+                                                           int endOfDayInMillisOfDay) {
+        return new LocalTime(0, 0, 0, 0).getMillisOfDay() <= nowInMillisOfDay
+                && nowInMillisOfDay < endOfDayInMillisOfDay;
+    }
+
+    private boolean isNowAfterStartOfWorkhoursBeforeMidnight(int startTimeInSecondsOfDay,
+                                                             int nowInMillisOfDay) {
+        return startTimeInSecondsOfDay <= nowInMillisOfDay
+                && nowInMillisOfDay <= new LocalTime(23, 59, 59, 999).getMillisOfDay();
     }
 
     private boolean nowIsAfterWorkHours() {

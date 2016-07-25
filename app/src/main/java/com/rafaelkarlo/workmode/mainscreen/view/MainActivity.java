@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
 
     @Override
     public void displayErrorOnInvalidWorkHours() {
-        displayErrorSnackbarWithMessage("Start time should be before Stop time");
+        displayErrorSnackbarWithMessage("Start time should not be equal to Stop time");
         switchButton.setChecked(false);
     }
 

@@ -70,7 +70,7 @@ public class MainPresenterImpl implements MainPresenter {
 
         if (workHoursAreMissing(startTime, endTime)) {
             mainView.displayErrorOnMissingWorkHours();
-        } else if (isEndTimeBeforeStartTime(startTime, endTime)) {
+        } else if (startTime.equals(endTime)) {
             mainView.displayErrorOnInvalidWorkHours();
         } else {
             workModeService.activate();

@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import rx.Scheduler;
@@ -23,7 +24,6 @@ import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.VIBRATE;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static rx.schedulers.Schedulers.immediate;
@@ -70,9 +70,9 @@ public class AudioModeServiceTest {
         audioModeService.setModeTo(VIBRATE);
         audioModeService.setModeTo(SILENT);
 
-        verify(audioManager, atLeastOnce()).setRingerMode(RINGER_MODE_NORMAL);
-        verify(audioManager, atLeastOnce()).setRingerMode(RINGER_MODE_VIBRATE);
-        verify(audioManager, atLeastOnce()).setRingerMode(RINGER_MODE_SILENT);
+        verify(audioManager, Mockito.timeout(500).atLeastOnce()).setRingerMode(RINGER_MODE_NORMAL);
+        verify(audioManager, Mockito.timeout(500).atLeastOnce()).setRingerMode(RINGER_MODE_VIBRATE);
+        verify(audioManager, Mockito.timeout(500).atLeastOnce()).setRingerMode(RINGER_MODE_SILENT);
     }
 
     @Test

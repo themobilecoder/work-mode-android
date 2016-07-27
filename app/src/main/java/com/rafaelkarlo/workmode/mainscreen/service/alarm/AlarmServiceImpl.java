@@ -10,6 +10,8 @@ import org.joda.time.LocalDateTime;
 
 import java.util.Calendar;
 
+import javax.inject.Inject;
+
 import static android.app.AlarmManager.INTERVAL_DAY;
 import static android.app.AlarmManager.RTC_WAKEUP;
 import static com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmUtils.createIntentWithIdentifierAndTime;
@@ -20,6 +22,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final Context context;
     private final AlarmManager alarmManager;
 
+    @Inject
     public AlarmServiceImpl(Context context, AlarmManager alarmManager) {
         this.context = context;
         this.alarmManager = alarmManager;

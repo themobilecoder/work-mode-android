@@ -80,10 +80,6 @@ public class MainPresenterImpl implements MainPresenter {
         }
     }
 
-    private boolean isEndTimeBeforeStartTime(LocalTime startTime, LocalTime endTime) {
-        return endTime.isBefore(startTime);
-    }
-
     private boolean workHoursAreMissing(LocalTime startTime, LocalTime endTime) {
         return startTime == null || endTime == null;
     }

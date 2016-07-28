@@ -4,6 +4,9 @@ import android.content.SharedPreferences;
 
 import org.joda.time.LocalTime;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 
 public class WorkTimeServiceImpl implements WorkTimeService {
@@ -49,6 +52,27 @@ public class WorkTimeServiceImpl implements WorkTimeService {
             return null;
         }
         return LocalTime.fromMillisOfDay(timeInMillis);
+    }
+
+    @Override
+    public void saveWorkDays(HashSet<Workday> workdays) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        for (Workday workday : workdays) {
+            editor.putBoolean(workday.toString(), true);
+        }
+        editor.apply();
+    }
+
+    @Override
+    public Set<Workday> getWorkDays() {
+        Set<Workday> workdays = new HashSet<>();
+        for (Workday workday : Workday.values()) {
+            boolean isWorkDaySaved = sharedPreferences.getBoolean(workday.toString(), false);
+            if (isWorkDaySaved) {
+                workdays.add(workday);
+            }
+        }
+        return workdays;
     }
 
 }

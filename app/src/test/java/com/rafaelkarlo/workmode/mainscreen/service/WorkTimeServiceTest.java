@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeServiceImpl;
+import com.rafaelkarlo.workmode.mainscreen.service.time.Workday;
 
 import org.joda.time.LocalTime;
 import org.junit.Before;
@@ -12,7 +13,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.google.common.truth.Truth.assertThat;
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -78,6 +83,74 @@ public class WorkTimeServiceTest {
         assertThat(workTimeService.getEndWorkTime()).isNull();
     }
 
+    @Test
+    public void shouldSaveWorkDays() {
+        setupWhenSavingWorkDays();
+
+        HashSet<Workday> workdays = new HashSet<>(asList(
+                Workday.SUNDAY,
+                Workday.MONDAY,
+                Workday.TUESDAY,
+                Workday.WEDNESDAY,
+                Workday.THURSDAY,
+                Workday.FRIDAY,
+                Workday.SATURDAY
+        ));
+
+        workTimeService.saveWorkDays(workdays);
+
+        verifyThatWorkDaysHaveBeenSaved();
+    }
+
+    @Test
+    public void shouldGetSavedWorkDays() {
+        setupWhenGettingWorkDays();
+
+
+        Set<Workday> expectedSavedDays = new HashSet<>(asList(
+           Workday.SUNDAY,
+           Workday.MONDAY,
+           Workday.TUESDAY,
+           Workday.WEDNESDAY,
+           Workday.THURSDAY,
+           Workday.FRIDAY,
+           Workday.SATURDAY
+        ));
+        assertThat(workTimeService.getWorkDays()).containsExactlyElementsIn(expectedSavedDays);
+    }
+
+    private void setupWhenGettingWorkDays() {
+        when(sharedPreferences.getBoolean("SUNDAY", false)).thenReturn(true);
+        when(sharedPreferences.getBoolean("MONDAY", false)).thenReturn(true);
+        when(sharedPreferences.getBoolean("TUESDAY", false)).thenReturn(true);
+        when(sharedPreferences.getBoolean("WEDNESDAY", false)).thenReturn(true);
+        when(sharedPreferences.getBoolean("THURSDAY", false)).thenReturn(true);
+        when(sharedPreferences.getBoolean("FRIDAY", false)).thenReturn(true);
+        when(sharedPreferences.getBoolean("SATURDAY", false)).thenReturn(true);
+    }
+
+    private void setupWhenSavingWorkDays() {
+        when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("SUNDAY", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("MONDAY", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("TUESDAY", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("WEDNESDAY", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("THURSDAY", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("FRIDAY", true)).thenReturn(sharedPreferencesEditor);
+        when(sharedPreferencesEditor.putBoolean("SATURDAY", true)).thenReturn(sharedPreferencesEditor);
+    }
+
+    private void verifyThatWorkDaysHaveBeenSaved() {
+        verify(sharedPreferencesEditor).putBoolean("SUNDAY", true);
+        verify(sharedPreferencesEditor).putBoolean("MONDAY", true);
+        verify(sharedPreferencesEditor).putBoolean("TUESDAY", true);
+        verify(sharedPreferencesEditor).putBoolean("WEDNESDAY", true);
+        verify(sharedPreferencesEditor).putBoolean("THURSDAY", true);
+        verify(sharedPreferencesEditor).putBoolean("FRIDAY", true);
+        verify(sharedPreferencesEditor).putBoolean("SATURDAY", true);
+        verify(sharedPreferencesEditor).apply();
+    }
+
     private void setupMockForSavingStartTime() {
         when(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor);
         int millisOfStartTimeToday = expectedStartTime.getMillisOfDay();
@@ -89,9 +162,4 @@ public class WorkTimeServiceTest {
         int millisOfEndTimeToday = expectedEndTime.getMillisOfDay();
         when(sharedPreferencesEditor.putInt(WORK_END_TIME_KEY, millisOfEndTimeToday)).thenReturn(sharedPreferencesEditor);
     }
-
-
-
-
-
 }

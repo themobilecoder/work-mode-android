@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent_layout"
     android:layout_width="match_parent"
@@ -26,6 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="60dp"
+                android:layout_marginRight="60dp"
                 android:text="@string/work_mode_status_text"
                 android:textSize="18sp" />
 
@@ -34,6 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/work_mode_status_label"
+                android:layout_toRightOf="@id/work_mode_status_label"
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -59,6 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="29dp"
+                android:layout_marginRight="29dp"
                 android:text="Start Time"
                 android:textSize="18sp" />
 
@@ -67,6 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/work_start_time_label"
+                android:layout_toRightOf="@id/work_start_time_label"
                 android:gravity="center"
                 android:text="--"
                 android:textSize="18sp"
@@ -78,8 +83,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_time_24dp"
-                android:tint="#455A64" />
+                android:layout_alignParentRight="true"
+                android:tint="#455A64"
+                app:srcCompat="@drawable/ic_time_24dp" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>
@@ -99,6 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="30dp"
+                android:layout_marginRight="30dp"
                 android:text="Stop Time"
                 android:textSize="18sp" />
 
@@ -107,6 +114,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/work_end_time_label"
+                android:layout_toRightOf="@id/work_end_time_label"
                 android:gravity="center"
                 android:text="--"
                 android:textSize="18sp"
@@ -118,8 +126,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_time_24dp"
-                android:tint="#455A64" />
+                android:layout_alignParentRight="true"
+                android:tint="#455A64"
+                app:srcCompat="@drawable/ic_time_24dp" />
 
         </RelativeLayout>
 
@@ -139,6 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="26dp"
+                android:layout_marginRight="26dp"
                 android:text="Work Days"
                 android:textSize="18sp" />
 
@@ -147,17 +157,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/work_days_label"
+                android:layout_toRightOf="@id/work_days_label"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="M, T, W, Th, F, Sa, Su" />
 
-            <ImageView
+            <android.support.v7.widget.AppCompatImageView
                 android:id="@+id/set_days_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_set_days_24dp"
-                android:tint="#455A64" />
+                android:layout_alignParentRight="true"
+                android:tint="#455A64"
+                app:srcCompat="@drawable/ic_set_days_24dp" />
 
         </RelativeLayout>
 

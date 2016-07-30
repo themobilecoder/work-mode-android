@@ -2,6 +2,7 @@ package com.rafaelkarlo.workmode.mainscreen.presenter;
 
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 
 import org.joda.time.LocalTime;
@@ -11,22 +12,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
-
-import static java.lang.String.format;
+import static com.google.common.truth.Truth.assertThat;
+import static com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay.MONDAY;
+import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static rx.Observable.just;
-import static rx.Observable.merge;
-import static rx.schedulers.Schedulers.io;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MainPresenterTest {
@@ -52,6 +49,7 @@ public class MainPresenterTest {
     public void shouldUpdateStatusWhenWorkModeHasBeenActivated() {
         when(workModeService.getStartTime()).thenReturn(new LocalTime());
         when(workModeService.getEndTime()).thenReturn(new LocalTime());
+        when(workModeService.getWorkDays()).thenReturn(new HashSet<>(singletonList(MONDAY)));
 
         mainPresenter.activateWorkMode();
 
@@ -77,6 +75,7 @@ public class MainPresenterTest {
         verify(mainView).onWorkModeActivation();
         verify(mainView).onSetStartDate(anyString());
         verify(mainView).onSetStartDate(anyString());
+        verify(mainView).onSetWorkDays(anyString());
     }
 
     @Test
@@ -115,11 +114,27 @@ public class MainPresenterTest {
     }
 
     @Test
+    public void shouldNotBeAllowedToEnableWhenWorkDaysSetIsEmpty() {
+        LocalTime someLocalTime = new LocalTime();
+        LocalTime someOtherLocalTime = new LocalTime().plusSeconds(1);
+        when(workModeService.getStartTime()).thenReturn(someLocalTime);
+        when(workModeService.getEndTime()).thenReturn(someOtherLocalTime);
+
+        when(workModeService.getWorkDays()).thenReturn(Collections.<WorkDay>emptySet());
+
+        mainPresenter.activateWorkMode();
+
+        verify(mainView, never()).onWorkModeActivation();
+        verify(mainView).displayErrorOnMissingWorkDays();
+    }
+
+    @Test
     public void shouldBeAllowedToActivateWhenStartTimeIsLaterThanEndTime() {
         LocalTime afternoonTime = new LocalTime(17, 0);
         LocalTime morningTime = new LocalTime(9, 0);
         when(workModeService.getStartTime()).thenReturn(afternoonTime);
         when(workModeService.getEndTime()).thenReturn(morningTime);
+        when(workModeService.getWorkDays()).thenReturn(new HashSet<>(singletonList(MONDAY)));
 
         mainPresenter.activateWorkMode();
 
@@ -128,7 +143,7 @@ public class MainPresenterTest {
     }
 
     @Test
-    public void shouldNotBeAllowedToActivateWhenStartTimeIsLEqualToEndTime() {
+    public void shouldNotBeAllowedToActivateWhenStartTimeIsEqualToEndTime() {
         LocalTime afternoonTime = new LocalTime(17, 0);
         LocalTime morningTime = new LocalTime(17, 0);
         when(workModeService.getStartTime()).thenReturn(afternoonTime);
@@ -155,9 +170,35 @@ public class MainPresenterTest {
     }
 
     @Test
+    public void shouldDeactivateWhenNewWorkDaysHaveBeenSet() {
+        Set<WorkDay> dontCareWorkDays = null;
+        mainPresenter.setWorkDays(dontCareWorkDays);
+
+        verify(mainView).onWorkModeDeactivation();
+    }
+
+    @Test
+    public void shouldUpdateWorkDaysDisplayAfterSettingWorkdays() {
+        HashSet<WorkDay> workDays = new HashSet<>(singletonList(MONDAY));
+        mainPresenter.setWorkDays(workDays);
+
+        verify(workModeService).setWorkDays(workDays);
+        verify(mainView).onSetWorkDays(anyString());
+    }
+
+    @Test
+    public void shouldBeAbleToGetSavedDays() {
+        HashSet<WorkDay> savedWorkDays = new HashSet<>(singletonList(MONDAY));
+        when(workModeService.getWorkDays()).thenReturn(savedWorkDays);
+
+        assertThat(mainPresenter.getSavedDays()).isEqualTo(savedWorkDays);
+    }
+
+    @Test
     public void shouldStartAlarmWhenActivating() {
         LocalTime validStartTime = new LocalTime(9, 0);
         LocalTime validEndTime = new LocalTime(17, 0);
+        when(workModeService.getWorkDays()).thenReturn(new HashSet<>(singletonList(MONDAY)));
         when(workModeService.getStartTime()).thenReturn(validStartTime);
         when(workModeService.getEndTime()).thenReturn(validEndTime);
 

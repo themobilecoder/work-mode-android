@@ -7,16 +7,6 @@
     android:padding="10dp">
 
     <ToggleButton
-        android:id="@+id/sunday_check_box"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:checked="false"
-        android:background="@drawable/day_toggle_button"
-        android:layout_marginEnd="1dp"
-        android:textOff="S"
-        android:textOn="S" />
-
-    <ToggleButton
         android:id="@+id/monday_check_box"
         android:layout_width="32dp"
         android:layout_height="32dp"
@@ -75,5 +65,14 @@
         android:textOff="S"
         android:textOn="S" />
 
+    <ToggleButton
+        android:id="@+id/sunday_check_box"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:checked="false"
+        android:background="@drawable/day_toggle_button"
+        android:layout_marginEnd="1dp"
+        android:textOff="S"
+        android:textOn="S" />
 
 </LinearLayout>

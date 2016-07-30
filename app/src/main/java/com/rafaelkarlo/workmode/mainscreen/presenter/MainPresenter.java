@@ -1,6 +1,9 @@
 package com.rafaelkarlo.workmode.mainscreen.presenter;
 
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
+
+import java.util.Set;
 
 public interface MainPresenter {
 
@@ -10,4 +13,8 @@ public interface MainPresenter {
     void deactivateWorkMode();
     void setStartDate(int hour, int minute);
     void setEndDate(int hour, int minute);
+
+    void setWorkDays(Set<WorkDay> workDays);
+
+    Set<WorkDay> getSavedDays();
 }

@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeServiceImpl;
-import com.rafaelkarlo.workmode.mainscreen.service.time.Workday;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 
 import org.joda.time.LocalTime;
 import org.junit.Before;
@@ -87,17 +87,17 @@ public class WorkTimeServiceTest {
     public void shouldSaveWorkDays() {
         setupWhenSavingWorkDays();
 
-        HashSet<Workday> workdays = new HashSet<>(asList(
-                Workday.SUNDAY,
-                Workday.MONDAY,
-                Workday.TUESDAY,
-                Workday.WEDNESDAY,
-                Workday.THURSDAY,
-                Workday.FRIDAY,
-                Workday.SATURDAY
+        HashSet<WorkDay> workDays = new HashSet<>(asList(
+                WorkDay.SUNDAY,
+                WorkDay.MONDAY,
+                WorkDay.TUESDAY,
+                WorkDay.WEDNESDAY,
+                WorkDay.THURSDAY,
+                WorkDay.FRIDAY,
+                WorkDay.SATURDAY
         ));
 
-        workTimeService.saveWorkDays(workdays);
+        workTimeService.saveWorkDays(workDays);
 
         verifyThatWorkDaysHaveBeenSaved();
     }
@@ -107,14 +107,14 @@ public class WorkTimeServiceTest {
         setupWhenGettingWorkDays();
 
 
-        Set<Workday> expectedSavedDays = new HashSet<>(asList(
-           Workday.SUNDAY,
-           Workday.MONDAY,
-           Workday.TUESDAY,
-           Workday.WEDNESDAY,
-           Workday.THURSDAY,
-           Workday.FRIDAY,
-           Workday.SATURDAY
+        Set<WorkDay> expectedSavedDays = new HashSet<>(asList(
+           WorkDay.SUNDAY,
+           WorkDay.MONDAY,
+           WorkDay.TUESDAY,
+           WorkDay.WEDNESDAY,
+           WorkDay.THURSDAY,
+           WorkDay.FRIDAY,
+           WorkDay.SATURDAY
         ));
         assertThat(workTimeService.getWorkDays()).containsExactlyElementsIn(expectedSavedDays);
     }

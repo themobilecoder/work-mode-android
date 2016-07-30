@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,14 +15,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.google.common.truth.Truth.assertThat;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.NORMAL;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.VIBRATE;
+import static java.util.Arrays.asList;
 import static org.joda.time.DateTimeUtils.setCurrentMillisFixed;
 import static org.joda.time.DateTimeUtils.setCurrentMillisSystem;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +55,19 @@ public class WorkModeServiceTest {
     public void setup() {
         workModeService = new WorkModeService(audioModeService, workTimeService, sharedPreferences);
         resetToPresent();
+    }
+
+    @Before
+    public void setEverydayAsWorkDays() {
+        when(workTimeService.getWorkDays()).thenReturn(new HashSet<>(asList(
+                WorkDay.SUNDAY,
+                WorkDay.TUESDAY,
+                WorkDay.WEDNESDAY,
+                WorkDay.THURSDAY,
+                WorkDay.FRIDAY,
+                WorkDay.SATURDAY,
+                WorkDay.SUNDAY
+        )));
     }
 
     @Test
@@ -191,6 +211,82 @@ public class WorkModeServiceTest {
         workModeService.setToSilentMode();
     }
 
+    @Test
+    public void shouldSetToSilentModeOnWorkDays() {
+        setWorkHours();
+        setWorkModeToActivatedMode();
+
+        setOnlyMondayAsWorkday();
+
+        LocalDateTime mondayWorkDayTime = new LocalDateTime()
+                .withDate(2016, 7, 25)
+                .withTime(9, 0, 0, 0);
+        setCurrentDayAndTime(mondayWorkDayTime);
+
+        assertThat(workModeService.setToSilentMode()).isTrue();
+
+        verify(audioModeService).setModeTo(SILENT);
+    }
+
+    @Test
+    public void shouldNotSetToSilentModeDuringNonWorkDays() {
+        setWorkHours();
+        setWorkModeToActivatedMode();
+
+        setOnlyMondayAsWorkday();
+
+        LocalDateTime notAWorkDayTuesday = new LocalDateTime()
+                .withDate(2016, 7, 26)
+                .withTime(9, 0, 0, 0);
+        setCurrentDayAndTime(notAWorkDayTuesday);
+
+        assertThat(workModeService.setToSilentMode()).isFalse();
+
+        verifyNoMoreInteractions(audioModeService);
+    }
+
+    @Test
+    public void shouldSetToNormalModeDuringWorkDaysAfterWorkHours() {
+        setWorkHours();
+        setWorkModeToActivatedMode();
+
+        setOnlyMondayAsWorkday();
+
+        LocalDateTime mondayAfterWorkHoursDayTime = new LocalDateTime()
+                .withDate(2016, 7, 25)
+                .withTime(18, 0, 0, 0);
+        setCurrentDayAndTime(mondayAfterWorkHoursDayTime);
+
+        assertThat(workModeService.setToNormalMode()).isTrue();
+
+        verify(audioModeService).setModeTo(NORMAL);
+    }
+
+    @Test
+    public void shouldNotSetToNormalModeOutsideWorkDays() {
+        setWorkHours();
+        setWorkModeToActivatedMode();
+
+        setOnlyMondayAsWorkday();
+
+        LocalDateTime notAWorkDayTuesday = new LocalDateTime()
+                .withDate(2016, 7, 26)
+                .withTime(18, 0, 0, 0);
+        setCurrentDayAndTime(notAWorkDayTuesday);
+
+        assertThat(workModeService.setToNormalMode()).isFalse();
+
+        verifyNoMoreInteractions(audioModeService);
+    }
+
+    @Test
+    public void shouldBeAbleToSetWorkDays() {
+        Set<WorkDay> workDays = new HashSet<>(asList(WorkDay.MONDAY));
+        workModeService.setWorkDays(workDays);
+
+        verify(workTimeService).saveWorkDays(workDays);
+    }
+
     private void setWorkHours() {
         when(workTimeService.getStartWorkTime()).thenReturn((START_WORK_TIME));
         when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
@@ -200,8 +296,18 @@ public class WorkModeServiceTest {
         when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(true);
     }
 
+    private void setOnlyMondayAsWorkday() {
+        Set<WorkDay> savedDaysSet = new HashSet<>();
+        savedDaysSet.add(WorkDay.MONDAY);
+        when(workTimeService.getWorkDays()).thenReturn(savedDaysSet);
+    }
+
     private void setWorkModeToDeactivatedMode() {
         when(sharedPreferences.getBoolean(WORK_MODE_ACTIVATED_KEY, false)).thenReturn(false);
+    }
+
+    private void setCurrentDayAndTime(LocalDateTime tuesdayWorkDay) {
+        setCurrentMillisFixed(tuesdayWorkDay.toDateTime().getMillis());
     }
 
     private static void setCurrentTime(LocalTime localTime) {

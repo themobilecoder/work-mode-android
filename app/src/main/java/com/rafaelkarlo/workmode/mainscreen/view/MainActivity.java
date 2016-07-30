@@ -1,5 +1,6 @@
 package com.rafaelkarlo.workmode.mainscreen.view;
 
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -15,8 +16,11 @@ import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFra
 import com.rafaelkarlo.workmode.MainApplication;
 import com.rafaelkarlo.workmode.R;
 import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 
 import org.joda.time.LocalTime;
+
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -57,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @BindView(R.id.work_end_time_value)
     TextView workEndTimeText;
 
+    @BindView(R.id.work_days_value)
+    TextView workDaysValue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +95,11 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     }
 
     @Override
+    public void onSetWorkDays(String workDays) {
+        workDaysValue.setText(workDays);
+    }
+
+    @Override
     public void displayActivationSuccessful() {
         displaySuccessfulSnackbarWithMessage(
                 format("Muting phone from %s to %s",
@@ -106,6 +118,12 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @Override
     public void displayErrorOnInvalidWorkHours() {
         displayErrorSnackbarWithMessage("Start time should not be equal to Stop time");
+        switchButton.setChecked(false);
+    }
+
+    @Override
+    public void displayErrorOnMissingWorkDays() {
+        displayErrorSnackbarWithMessage("Please add work days");
         switchButton.setChecked(false);
     }
 
@@ -145,9 +163,17 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.day_picker_dialog, null);
+        final DaysToggleViewHolder daysToggleViewHolder = new DaysToggleViewHolder(dialogView);
+        daysToggleViewHolder.updateToggleButtons(mainPresenter.getSavedDays());
         dialogBuilder.setView(dialogView);
         dialogBuilder.setTitle("Work Days");
-        dialogBuilder.setPositiveButton("Save", null);
+        dialogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Set<WorkDay> daysSet = daysToggleViewHolder.getDaysSet();
+                mainPresenter.setWorkDays(daysSet);
+            }
+        });
         dialogBuilder.setNegativeButton("Cancel", null);
 
         dialogBuilder.create().show();

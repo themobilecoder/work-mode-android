@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode;
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
+
+import java.util.Set;
 
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.NORMAL;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT;
@@ -78,16 +80,24 @@ public class WorkModeService {
         return workTimeService.getEndWorkTime();
     }
 
+    public void setWorkDays(Set<WorkDay> workDays) {
+        workTimeService.saveWorkDays(workDays);
+    }
+
+    public Set<WorkDay> getWorkDays() {
+        return workTimeService.getWorkDays();
+    }
+
     private AudioMode getPreviousRingerMode() {
         return audioModeService.getPreviouslySavedMode();
     }
 
     private boolean canSetToSilentMode() {
-        return nowIsWithinWorkHours() && isActivated();
+        return nowIsWithinWorkHours() && isActivated() && nowIsAWorkDay();
     }
 
     private boolean canSetToNormalMode() {
-        return nowIsAfterWorkHours() && isActivated();
+        return nowIsAfterWorkHours() && isActivated() && nowIsAWorkDay();
     }
 
     private boolean nowIsWithinWorkHours() {
@@ -105,6 +115,12 @@ public class WorkModeService {
             return startTimeInMillisOfDay <= nowInMillisOfDay
                     && nowInMillisOfDay <= endTimeInMillisOfDay;
         }
+    }
+
+    private boolean nowIsAWorkDay() {
+        int currentDayInt = now().getDayOfWeek();
+        WorkDay currentDay = WorkDay.getDayFromValue(currentDayInt);
+        return workTimeService.getWorkDays().contains(currentDay);
     }
 
     private boolean isNowBetweenStartAndEndDuringNightShift(int startTimeInSecondsOfDay, int endTimeInSecondsOfDay, int nowInMillisOfDay) {

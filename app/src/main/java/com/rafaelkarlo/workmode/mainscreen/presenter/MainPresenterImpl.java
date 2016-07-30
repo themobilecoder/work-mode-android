@@ -2,11 +2,18 @@ package com.rafaelkarlo.workmode.mainscreen.presenter;
 
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalTime;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -28,6 +35,7 @@ public class MainPresenterImpl implements MainPresenter {
     public void onCreate() {
         updateViewForStatus();
         updateWorkHoursView();
+        updateWorkDaysView();
     }
 
     @Override
@@ -64,19 +72,34 @@ public class MainPresenterImpl implements MainPresenter {
         mainView.onWorkModeDeactivation();
     }
 
+    @Override
+    public void setWorkDays(Set<WorkDay> workDays) {
+        workModeService.setWorkDays(workDays);
+        updateWorkDaysView();
+        mainView.onWorkModeDeactivation();
+    }
+
+    @Override
+    public Set<WorkDay> getSavedDays() {
+        return workModeService.getWorkDays();
+    }
+
     private void activateWorkModeIfAllowed() {
         LocalTime startTime = workModeService.getStartTime();
         LocalTime endTime = workModeService.getEndTime();
+        Set<WorkDay> workDaySet = workModeService.getWorkDays();
 
         if (workHoursAreMissing(startTime, endTime)) {
             mainView.displayErrorOnMissingWorkHours();
         } else if (startTime.equals(endTime)) {
             mainView.displayErrorOnInvalidWorkHours();
+        } else if (workDaySet.isEmpty()) {
+            mainView.displayErrorOnMissingWorkDays();
         } else {
-            workModeService.activate();
-            workModeAlarm.startAlarm(startTime, endTime);
-            mainView.onWorkModeActivation();
-            mainView.displayActivationSuccessful();
+                workModeService.activate();
+                workModeAlarm.startAlarm(startTime, endTime);
+                mainView.onWorkModeActivation();
+                mainView.displayActivationSuccessful();
         }
     }
 
@@ -102,8 +125,40 @@ public class MainPresenterImpl implements MainPresenter {
         mainView.onSetEndDate(endDateString);
     }
 
+    private void updateWorkDaysView() {
+        Set<WorkDay> workDays = workModeService.getWorkDays();
+        String daysToDisplay = workDays.isEmpty() ? "--" : shortenDayAndMerge(workDays);
+        mainView.onSetWorkDays(daysToDisplay);
+    }
+
     private String getFormattedTimeString(int hour, int minute) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a");
         return simpleDateFormat.format(new LocalTime(hour, minute).toDateTimeToday().toDate());
+    }
+
+    private String shortenDayAndMerge(Set<WorkDay> workDays) {
+        List<WorkDay> workDayList = new ArrayList<>(workDays);
+        sortWorkdayListChronologically(workDayList);
+        List<String> workDaysAsString = new ArrayList<>();
+        for (WorkDay workDay : workDayList) {
+            String workDayStringPrettified = workDay.getShortenDayString();
+            workDaysAsString.add(workDayStringPrettified);
+        }
+        return StringUtils.join(workDaysAsString, ", ");
+    }
+
+    private void sortWorkdayListChronologically(List<WorkDay> workDayList) {
+        Collections.sort(workDayList, new Comparator<WorkDay>() {
+            @Override
+            public int compare(WorkDay lhs, WorkDay rhs) {
+                if (lhs.getValue() < rhs.getValue()) {
+                    return -1;
+                } else if (lhs.getValue() == rhs.getValue()) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        });
     }
 }

@@ -55,24 +55,24 @@ public class WorkTimeServiceImpl implements WorkTimeService {
     }
 
     @Override
-    public void saveWorkDays(HashSet<Workday> workdays) {
+    public void saveWorkDays(Set<WorkDay> workDays) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        for (Workday workday : workdays) {
-            editor.putBoolean(workday.toString(), true);
+        for (WorkDay workDay : WorkDay.values()) {
+            editor.putBoolean(workDay.toString(), workDays.contains(workDay));
         }
         editor.apply();
     }
 
     @Override
-    public Set<Workday> getWorkDays() {
-        Set<Workday> workdays = new HashSet<>();
-        for (Workday workday : Workday.values()) {
-            boolean isWorkDaySaved = sharedPreferences.getBoolean(workday.toString(), false);
+    public Set<WorkDay> getWorkDays() {
+        Set<WorkDay> workDays = new HashSet<>();
+        for (WorkDay workDay : WorkDay.values()) {
+            boolean isWorkDaySaved = sharedPreferences.getBoolean(workDay.toString(), false);
             if (isWorkDaySaved) {
-                workdays.add(workday);
+                workDays.add(workDay);
             }
         }
-        return workdays;
+        return workDays;
     }
 
 }

@@ -1,27 +1,29 @@
 package com.rafaelkarlo.workmode.mainscreen.service.time;
 
-public enum Workday {
+public enum WorkDay {
 
-    SUNDAY(7),
-    MONDAY(1),
-    TUESDAY(2),
-    WEDNESDAY(3),
-    THURSDAY(4),
-    FRIDAY(5),
-    SATURDAY(6),
-    UNKNOWN(-1);
+    SUNDAY(7, "Su"),
+    MONDAY(1, "M"),
+    TUESDAY(2, "T"),
+    WEDNESDAY(3, "W"),
+    THURSDAY(4, "Th"),
+    FRIDAY(5, "F"),
+    SATURDAY(6, "Sa"),
+    UNKNOWN(-1, "");
 
     private final int value;
+    private final String shortenDayString;
 
-    Workday(int value) {
+    WorkDay(int value, String shortenDayString) {
         this.value = value;
+        this.shortenDayString = shortenDayString;
     }
 
     public int getValue() {
         return value;
     }
 
-    public static Workday getDayFromValue(int dayValue) {
+    public static WorkDay getDayFromValue(int dayValue) {
         switch (dayValue) {
             case 7:
                 return SUNDAY;
@@ -40,5 +42,9 @@ public enum Workday {
             default:
                 return UNKNOWN;
         }
+    }
+
+    public String getShortenDayString() {
+        return shortenDayString;
     }
 }

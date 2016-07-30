@@ -176,7 +176,11 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
         });
         dialogBuilder.setNegativeButton("Cancel", null);
 
-        dialogBuilder.create().show();
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.red));
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.red));
     }
 
     private void setViewToDeactivated() {

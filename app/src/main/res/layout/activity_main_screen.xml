@@ -158,6 +158,8 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/work_days_label"
                 android:layout_toRightOf="@id/work_days_label"
+                android:layout_toStartOf="@+id/set_days_button"
+                android:layout_toLeftOf="@+id/set_days_button"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="M, T, W, Th, F, Sa, Su" />
@@ -168,6 +170,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:tint="#455A64"
                 app:srcCompat="@drawable/ic_set_days_24dp" />
 

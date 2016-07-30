@@ -2,8 +2,10 @@ package com.rafaelkarlo.workmode.mainscreen.service.alarm;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 
 import org.joda.time.LocalDateTime;
@@ -30,11 +32,13 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void setRepeatingAlarmForDateTimeWithIdentifier(LocalDateTime triggerDateTime, String identifier) {
+        enableAlarmSchedulingOnBoot();
         setDailyAlarmForAnAction(triggerDateTime, identifier);
     }
 
     @Override
     public void cancelAlarmWithIdentifier(String identifier) {
+        disableAlarmSchedulingOnBoot();
         alarmManager.cancel(createPendingIntentWithIntent(context, createIntentWithIdentifierAndTime(context, identifier, 0)));
     }
 
@@ -72,5 +76,22 @@ public class AlarmServiceImpl implements AlarmService {
         Calendar calendarSilentInstance = Calendar.getInstance();
         calendarSilentInstance.setTime(triggerTime.toDate());
         return calendarSilentInstance.getTimeInMillis();
+    }
+
+    private void enableAlarmSchedulingOnBoot() {
+        setAlarmSchedulingOnBoot(context, PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+    }
+
+    private void disableAlarmSchedulingOnBoot() {
+        setAlarmSchedulingOnBoot(context, PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+    }
+
+    private void setAlarmSchedulingOnBoot(Context context, int newState) {
+        ComponentName receiver = new ComponentName(context, WorkModeAlarmOnBootScheduler.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                newState,
+                PackageManager.DONT_KILL_APP);
     }
 }

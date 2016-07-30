@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.rafaelkarlo.workmode">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -18,6 +20,13 @@
         </activity>
 
         <receiver android:name=".mainscreen.service.alarm.WorkModeAlarmReceiver"/>
+
+        <receiver android:name=".mainscreen.service.alarm.WorkModeAlarmOnBootScheduler"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

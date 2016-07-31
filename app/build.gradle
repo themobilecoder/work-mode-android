@@ -17,8 +17,26 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue 'string', 'home_banner_ad_unit_id', getAdMobHomeBannerIdRelease()
+        }
+
+        debug {
+            minifyEnabled false
+            resValue 'string', 'home_banner_ad_unit_id', getAdMobHomeBannerIdDebug()
         }
     }
+}
+
+def getAdMobHomeBannerIdDebug() {
+    def Properties props = new Properties()
+    props.load(new FileInputStream(new File('admob.properties')))
+    return props['home_ad_unit_id_debug']
+}
+
+def getAdMobHomeBannerIdRelease() {
+    def Properties props = new Properties()
+    props.load(new FileInputStream(new File('admob.properties')))
+    return props['home_ad_unit_id_release']
 }
 
 dependencies {

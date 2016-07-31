@@ -11,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,12 +88,13 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        switch(itemId) {
+        switch (itemId) {
             case R.id.about_menu_item:
                 Toast.makeText(this, "Welcome from About", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.override_mode_menu_item:
                 Toast.makeText(this, "Welcome from Override", Toast.LENGTH_SHORT).show();
+                overrideAudioMode();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -197,6 +200,30 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
                 mainPresenter.setWorkDays(daysSet);
             }
         });
+        dialogBuilder.setNegativeButton("Cancel", null);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.red));
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.red));
+    }
+
+    private void overrideAudioMode() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View spinnerView = inflater.inflate(R.layout.override_mode_spinner, null);
+
+        Spinner spinner = (Spinner) spinnerView.findViewById(R.id.mode_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter
+                .createFromResource(this, R.array.modes_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        dialogBuilder.setView(spinnerView);
+        dialogBuilder.setTitle("Override Audio Mode");
+
+        dialogBuilder.setPositiveButton("Set", null);
         dialogBuilder.setNegativeButton("Cancel", null);
 
         AlertDialog alertDialog = dialogBuilder.create();

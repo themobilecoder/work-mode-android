@@ -1,7 +1,9 @@
 package com.rafaelkarlo.workmode.mainscreen.presenter;
 
+import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAudioOverrideService;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 
@@ -35,13 +37,16 @@ public class MainPresenterTest {
     private WorkModeService workModeService;
 
     @Mock
+    private WorkModeAudioOverrideService workModeAudioOverrideService;
+
+    @Mock
     private WorkModeAlarm workModeAlarm;
 
     private MainPresenter mainPresenter;
 
     @Before
     public void setupPresenter() {
-        mainPresenter = new MainPresenterImpl(workModeService, workModeAlarm);
+        mainPresenter = new MainPresenterImpl(workModeService, workModeAlarm, workModeAudioOverrideService);
         mainPresenter.attachView(mainView);
     }
 
@@ -219,6 +224,14 @@ public class MainPresenterTest {
         mainPresenter.deactivateWorkMode();
 
         verify(workModeService).setToPreviousMode();
+    }
+
+    @Test
+    public void shouldOverrideAudioModeWhenSet() {
+        mainPresenter.setCurrentAudioMode(AudioMode.NORMAL);
+
+        verify(workModeAudioOverrideService).overrideCurrentAudioMode(AudioMode.NORMAL);
+        verify(mainView).displayAudioOverrideSuccessMessage("Normal");
     }
 
 }

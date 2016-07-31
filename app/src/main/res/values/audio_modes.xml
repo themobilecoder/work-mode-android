@@ -2,7 +2,7 @@
 <resources>
     <string-array name="modes_array">
         <item>Normal</item>
-        <item>Vibrate Only</item>
+        <item>Vibrate</item>
         <item>Silent</item>
     </string-array>
 </resources>

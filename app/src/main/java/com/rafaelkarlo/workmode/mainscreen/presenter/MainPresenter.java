@@ -1,5 +1,6 @@
 package com.rafaelkarlo.workmode.mainscreen.presenter;
 
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 
@@ -17,4 +18,6 @@ public interface MainPresenter {
     void setWorkDays(Set<WorkDay> workDays);
 
     Set<WorkDay> getSavedDays();
+
+    void setCurrentAudioMode(AudioMode audioMode);
 }

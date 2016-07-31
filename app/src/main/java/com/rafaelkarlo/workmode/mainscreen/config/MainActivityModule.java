@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.preference.PreferenceManager;
 
 import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
+import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAudioOverrideService;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.AlarmServiceImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeServiceImpl;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarmImpl;
@@ -73,8 +74,14 @@ public class MainActivityModule {
 
     @Provides
     @Singleton
+    public WorkModeAudioOverrideService provideWorkModeAudioOverrideService() {
+        return new WorkModeAudioOverrideService(provideAudioModeService());
+    }
+
+    @Provides
+    @Singleton
     public MainPresenterImpl provideMainPresenter() {
-        return new MainPresenterImpl(provideWorkModeService(), provideWorkModeAlarm());
+        return new MainPresenterImpl(provideWorkModeService(), provideWorkModeAlarm(), provideWorkModeAudioOverrideService());
     }
 
     @Provides

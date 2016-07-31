@@ -11,5 +11,5 @@ public interface MainView {
     void displayErrorOnMissingWorkHours();
     void displayErrorOnInvalidWorkHours();
     void displayErrorOnMissingWorkDays();
-
+    void displayAudioOverrideSuccessMessage(String newAudioMode);
 }

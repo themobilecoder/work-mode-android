@@ -1,7 +1,9 @@
 package com.rafaelkarlo.workmode.mainscreen.presenter;
 
+import com.rafaelkarlo.workmode.mainscreen.service.WorkModeAudioOverrideService;
 import com.rafaelkarlo.workmode.mainscreen.service.alarm.WorkModeAlarm;
 import com.rafaelkarlo.workmode.mainscreen.service.WorkModeService;
+import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
 import com.rafaelkarlo.workmode.mainscreen.view.MainView;
 
@@ -23,12 +25,15 @@ public class MainPresenterImpl implements MainPresenter {
 
     private WorkModeService workModeService;
 
+    private WorkModeAudioOverrideService workModeAudioOverrideService;
+
     private WorkModeAlarm workModeAlarm;
 
     @Inject
-    public MainPresenterImpl(WorkModeService workModeService, WorkModeAlarm workModeAlarm) {
+    public MainPresenterImpl(WorkModeService workModeService, WorkModeAlarm workModeAlarm, WorkModeAudioOverrideService workModeAudioOverrideService) {
         this.workModeService = workModeService;
         this.workModeAlarm = workModeAlarm;
+        this.workModeAudioOverrideService = workModeAudioOverrideService;
     }
 
     @Override
@@ -82,6 +87,14 @@ public class MainPresenterImpl implements MainPresenter {
     @Override
     public Set<WorkDay> getSavedDays() {
         return workModeService.getWorkDays();
+    }
+
+    @Override
+    public void setCurrentAudioMode(AudioMode audioMode) {
+        workModeAudioOverrideService.overrideCurrentAudioMode(audioMode);
+        String audioModeString = audioMode.toString();
+        String prettifiedString = audioModeString.substring(0, 1) + audioModeString.substring(1).toLowerCase();
+        mainView.displayAudioOverrideSuccessMessage(prettifiedString);
     }
 
     private void activateWorkModeIfAllowed() {

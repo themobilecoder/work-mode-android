@@ -11,11 +11,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.rafaelkarlo.workmode.MainApplication;
@@ -90,10 +87,8 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.about_menu_item:
-                Toast.makeText(this, "Welcome from About", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.override_mode_menu_item:
-                Toast.makeText(this, "Welcome from Override", Toast.LENGTH_SHORT).show();
                 overrideAudioMode();
                 break;
         }
@@ -151,6 +146,11 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     public void displayErrorOnMissingWorkDays() {
         displayErrorSnackbarWithMessage("Please add work days");
         switchButton.setChecked(false);
+    }
+
+    @Override
+    public void displayAudioOverrideSuccessMessage(String newAudioMode) {
+        displaySuccessfulSnackbarWithMessage(format("Audio Mode Set to %s", newAudioMode));
     }
 
     @Override
@@ -212,18 +212,17 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     private void overrideAudioMode() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
-        final View spinnerView = inflater.inflate(R.layout.override_mode_spinner, null);
-
-        Spinner spinner = (Spinner) spinnerView.findViewById(R.id.mode_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter
-                .createFromResource(this, R.array.modes_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        dialogBuilder.setView(spinnerView);
+        final View overrideModeDialog = inflater.inflate(R.layout.override_mode_spinner, null);
+        dialogBuilder.setView(overrideModeDialog);
         dialogBuilder.setTitle("Override Audio Mode");
 
-        dialogBuilder.setPositiveButton("Set", null);
+        final OverrideAudioSpinnerViewHolder audioSpinnerViewHolder = new OverrideAudioSpinnerViewHolder(overrideModeDialog);
+        dialogBuilder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mainPresenter.setCurrentAudioMode(audioSpinnerViewHolder.getSelectedAudioMode());
+            }
+        });
         dialogBuilder.setNegativeButton("Cancel", null);
 
         AlertDialog alertDialog = dialogBuilder.create();

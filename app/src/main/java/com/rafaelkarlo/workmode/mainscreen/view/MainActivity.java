@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.rafaelkarlo.workmode.MainApplication;
 import com.rafaelkarlo.workmode.R;
 import com.rafaelkarlo.workmode.mainscreen.presenter.MainPresenterImpl;
@@ -66,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @BindView(R.id.work_days_value)
     TextView workDaysValue;
 
+    @BindView(R.id.adView)
+    AdView adView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
 
         mainPresenter.attachView(this);
         mainPresenter.onCreate();
+
+        loadAdbanner();
+
     }
 
     @Override
@@ -276,5 +284,10 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
             snackbar.getView().setBackgroundColor(getResources().getColor(R.color.successfulBackground));
             snackbar.show();
         }
+    }
+
+    private void loadAdbanner() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
     }
 }

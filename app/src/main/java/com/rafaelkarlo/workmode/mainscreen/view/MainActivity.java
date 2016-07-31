@@ -8,9 +8,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.rafaelkarlo.workmode.MainApplication;
@@ -72,6 +75,26 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
 
         mainPresenter.attachView(this);
         mainPresenter.onCreate();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        switch(itemId) {
+            case R.id.about_menu_item:
+                Toast.makeText(this, "Welcome from About", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.override_mode_menu_item:
+                Toast.makeText(this, "Welcome from Override", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

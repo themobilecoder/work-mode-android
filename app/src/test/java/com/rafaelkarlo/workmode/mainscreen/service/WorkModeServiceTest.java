@@ -61,6 +61,7 @@ public class WorkModeServiceTest {
     public void setEverydayAsWorkDays() {
         when(workTimeService.getWorkDays()).thenReturn(new HashSet<>(asList(
                 WorkDay.SUNDAY,
+                WorkDay.MONDAY,
                 WorkDay.TUESDAY,
                 WorkDay.WEDNESDAY,
                 WorkDay.THURSDAY,

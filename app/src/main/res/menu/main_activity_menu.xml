@@ -8,9 +8,4 @@
         android:orderInCategory="100"
         android:title="Override Mode"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/about_menu_item"
-        android:orderInCategory="101"
-        android:title="About"
-        app:showAsAction="never" />
 </menu>

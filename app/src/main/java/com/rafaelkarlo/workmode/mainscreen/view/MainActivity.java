@@ -94,8 +94,6 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         switch (itemId) {
-            case R.id.about_menu_item:
-                break;
             case R.id.override_mode_menu_item:
                 overrideAudioMode();
                 break;

@@ -4,8 +4,8 @@ package com.rafaelkarlo.workmode.mainscreen.service;
 import android.content.SharedPreferences;
 
 import com.rafaelkarlo.workmode.mainscreen.service.audio.AudioModeService;
-import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
 import com.rafaelkarlo.workmode.mainscreen.service.time.WorkDay;
+import com.rafaelkarlo.workmode.mainscreen.service.time.WorkTimeService;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -77,39 +77,39 @@ public class WorkModeServiceTest {
         setWorkModeToDeactivatedMode();
         setCurrentTime(START_WORK_TIME);
 
-        assertThat(workModeService.setToSilentMode()).isFalse();
+        assertThat(workModeService.setToWorkMode()).isFalse();
 
         setCurrentTime(END_WORK_TIME);
 
-        assertThat(workModeService.setToNormalMode()).isFalse();
+        assertThat(workModeService.setBackToOffWorkMode()).isFalse();
 
         verifyZeroInteractions(audioModeService);
     }
 
     @Test
-    public void shouldSetToSilentModeDuringWorkHours() {
+    public void shouldSetToWorkModeDuringWorkHours() {
         setWorkHours();
         setWorkModeToActivatedMode();
         setCurrentTime(START_WORK_TIME);
         when(audioModeService.getCurrentMode()).thenReturn(SILENT);
 
-        assertThat(workModeService.setToSilentMode()).isTrue();
+        assertThat(workModeService.setToWorkMode()).isTrue();
 
         verify(audioModeService).setModeTo(SILENT);
     }
 
     @Test
-    public void shouldNotSetToSilentModeWhenBeforeWorkHours() {
+    public void shouldNotSetToWorkModeBeforeWorkHours() {
         setWorkHours();
         setCurrentTime(START_WORK_TIME.minusMinutes(1));
 
-        assertThat(workModeService.setToSilentMode()).isFalse();
+        assertThat(workModeService.setToWorkMode()).isFalse();
 
         verifyZeroInteractions(audioModeService);
     }
 
     @Test
-    public void shouldSetToSilentDuringWorkHoursOnANightShiftBeforeMidnight() {
+    public void shouldSetToWorkDuringWorkHoursOnANightShiftBeforeMidnight() {
         LocalTime eveningStartWorkTime = new LocalTime(20, 0);
         LocalTime morningEndWorkTime = new LocalTime(4, 0);
         when(workTimeService.getStartWorkTime()).thenReturn(eveningStartWorkTime);
@@ -119,13 +119,13 @@ public class WorkModeServiceTest {
         LocalTime currentTimeBeforeMidnight = eveningStartWorkTime.plusMinutes(1);
         setCurrentTime(currentTimeBeforeMidnight);
 
-        assertThat(workModeService.setToSilentMode()).isTrue();
+        assertThat(workModeService.setToWorkMode()).isTrue();
 
         verify(audioModeService).setModeTo(SILENT);
     }
 
     @Test
-    public void shouldSetToSilentDuringWorkHoursOnANightShiftAfterMidnight() {
+    public void shouldSetToWorkModeDuringWorkHoursOnANightShiftAfterMidnight() {
         LocalTime eveningStartWorkTime = new LocalTime(20, 0);
         LocalTime morningEndWorkTime = new LocalTime(4, 0);
         when(workTimeService.getStartWorkTime()).thenReturn(eveningStartWorkTime);
@@ -135,40 +135,42 @@ public class WorkModeServiceTest {
         LocalTime currentTimeAfterMidnight = new LocalTime(1, 0, 0);
         setCurrentTime(currentTimeAfterMidnight);
 
-        assertThat(workModeService.setToSilentMode()).isTrue();
+        assertThat(workModeService.setToWorkMode()).isTrue();
 
         verify(audioModeService).setModeTo(SILENT);
     }
 
     @Test
-    public void shouldNotSetToSilentModeAfterWorkHours() {
+    public void shouldNotSetToWorkModeAfterWorkHours() {
         setWorkHours();
         setCurrentTime(END_WORK_TIME.plusMinutes(1));
 
-        assertThat(workModeService.setToSilentMode()).isFalse();
+        assertThat(workModeService.setToWorkMode()).isFalse();
         verifyZeroInteractions(audioModeService);
     }
 
     @Test
-    public void shouldSetToNormalModeAfterWorkHours() {
+    public void shouldSetToPreviousModeAfterWorkHours() {
         setWorkModeToActivatedMode();
         when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
         when(audioModeService.getCurrentMode()).thenReturn(NORMAL);
+        when(audioModeService.getPreviouslySavedMode()).thenReturn(NORMAL);
 
         setCurrentTime(END_WORK_TIME);
 
-        assertThat(workModeService.setToNormalMode()).isTrue();
+        assertThat(workModeService.setBackToOffWorkMode()).isTrue();
 
+        verify(audioModeService).getPreviouslySavedMode();
         verify(audioModeService).setModeTo(NORMAL);
     }
 
     @Test
-    public void shouldNotSetToNormalModeBeforeEndOfWorkHours() {
+    public void shouldNotSetToPreviousModeBeforeEndOfWorkHours() {
         when(workTimeService.getEndWorkTime()).thenReturn((END_WORK_TIME));
 
         setCurrentTime(END_WORK_TIME.minusMinutes(1));
 
-        assertThat(workModeService.setToNormalMode()).isFalse();
+        assertThat(workModeService.setBackToOffWorkMode()).isFalse();
 
         verifyZeroInteractions(audioModeService);
     }
@@ -209,11 +211,11 @@ public class WorkModeServiceTest {
     @Test
     public void shouldPersistCurrentModeWhenSettingTheMode() {
         setWorkHours();
-        workModeService.setToSilentMode();
+        workModeService.setToWorkMode();
     }
 
     @Test
-    public void shouldSetToSilentModeOnWorkDays() {
+    public void shouldSetToWorkModeOnWorkDays() {
         setWorkHours();
         setWorkModeToActivatedMode();
 
@@ -224,13 +226,13 @@ public class WorkModeServiceTest {
                 .withTime(9, 0, 0, 0);
         setCurrentDayAndTime(mondayWorkDayTime);
 
-        assertThat(workModeService.setToSilentMode()).isTrue();
+        assertThat(workModeService.setToWorkMode()).isTrue();
 
         verify(audioModeService).setModeTo(SILENT);
     }
 
     @Test
-    public void shouldNotSetToSilentModeDuringNonWorkDays() {
+    public void shouldNotSetToWorkModeDuringNonWorkDays() {
         setWorkHours();
         setWorkModeToActivatedMode();
 
@@ -241,15 +243,16 @@ public class WorkModeServiceTest {
                 .withTime(9, 0, 0, 0);
         setCurrentDayAndTime(notAWorkDayTuesday);
 
-        assertThat(workModeService.setToSilentMode()).isFalse();
+        assertThat(workModeService.setToWorkMode()).isFalse();
 
         verifyNoMoreInteractions(audioModeService);
     }
 
     @Test
-    public void shouldSetToNormalModeDuringWorkDaysAfterWorkHours() {
+    public void shouldSetToOffModeDuringWorkDaysAfterWorkHours() {
         setWorkHours();
         setWorkModeToActivatedMode();
+        when(audioModeService.getPreviouslySavedMode()).thenReturn(NORMAL);
 
         setOnlyMondayAsWorkday();
 
@@ -258,13 +261,14 @@ public class WorkModeServiceTest {
                 .withTime(18, 0, 0, 0);
         setCurrentDayAndTime(mondayAfterWorkHoursDayTime);
 
-        assertThat(workModeService.setToNormalMode()).isTrue();
+        assertThat(workModeService.setBackToOffWorkMode()).isTrue();
 
+        verify(audioModeService).getPreviouslySavedMode();
         verify(audioModeService).setModeTo(NORMAL);
     }
 
     @Test
-    public void shouldNotSetToNormalModeOutsideWorkDays() {
+    public void shouldNotSetToOffWorkModeOutsideWorkDays() {
         setWorkHours();
         setWorkModeToActivatedMode();
 
@@ -275,7 +279,7 @@ public class WorkModeServiceTest {
                 .withTime(18, 0, 0, 0);
         setCurrentDayAndTime(notAWorkDayTuesday);
 
-        assertThat(workModeService.setToNormalMode()).isFalse();
+        assertThat(workModeService.setBackToOffWorkMode()).isFalse();
 
         verifyNoMoreInteractions(audioModeService);
     }

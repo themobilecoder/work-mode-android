@@ -29,9 +29,9 @@ public class WorkModeAlarmReceiver extends BroadcastReceiver{
         scheduleNextAlarmIfVersionIsKitkatOrAbove(context, intent, actionIdentifier);
 
         if(actionIdentifier.equals(WORK_START_ACTION)) {
-            workModeService.setToSilentMode();
+            workModeService.setToWorkMode();
         } else if (actionIdentifier.equals(WORK_END_ACTION)){
-            workModeService.setToNormalMode();
+            workModeService.setBackToOffWorkMode();
         }
     }
 

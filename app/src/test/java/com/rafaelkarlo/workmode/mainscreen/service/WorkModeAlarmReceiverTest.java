@@ -57,21 +57,21 @@ public class WorkModeAlarmReceiverTest {
     }
 
     @Test
-    public void shouldSetToSilentModeWhenAlarmHasBeenTriggered() {
+    public void shouldSetToWorkModeWhenAlarmHasBeenTriggered() {
         when(intent.getAction()).thenReturn(START_WORK_ACTION_IDENTIFIER);
 
         workModeAlarmReceiver.onReceive(context, intent);
 
-        verify(workModeService, only()).setToSilentMode();
+        verify(workModeService, only()).setToWorkMode();
     }
 
     @Test
-    public void shouldSetToNormalModeWhenAlarmHasBeenTriggered() {
+    public void shouldSetToOffWorkModeWhenAlarmHasBeenTriggered() {
         when(intent.getAction()).thenReturn(END_WORK_ACTION_IDENTIFIER);
 
         workModeAlarmReceiver.onReceive(context, intent);
 
-        verify(workModeService, only()).setToNormalMode();
+        verify(workModeService, only()).setBackToOffWorkMode();
     }
 
     private void setupDaggerMocks() {

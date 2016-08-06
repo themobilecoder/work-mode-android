@@ -11,7 +11,6 @@ import org.joda.time.LocalTime;
 
 import java.util.Set;
 
-import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.NORMAL;
 import static com.rafaelkarlo.workmode.mainscreen.service.audio.AudioMode.SILENT;
 import static org.joda.time.DateTime.now;
 
@@ -29,8 +28,8 @@ public class WorkModeService {
         this.sharedPreferences = sharedPreferences;
     }
 
-    public boolean setToSilentMode() {
-        if (canSetToSilentMode()) {
+    public boolean setToWorkMode() {
+        if (canSetToWorkMode()) {
             saveCurrentRingerMode();
             audioModeService.setModeTo(SILENT);
             return true;
@@ -39,9 +38,9 @@ public class WorkModeService {
         }
     }
 
-    public boolean setToNormalMode() {
-        if (canSetToNormalMode()) {
-            audioModeService.setModeTo(NORMAL);
+    public boolean setBackToOffWorkMode() {
+        if (canSetToOffWorkMode()) {
+            setToPreviousMode();
             return true;
         } else {
             return false;
@@ -92,11 +91,11 @@ public class WorkModeService {
         return audioModeService.getPreviouslySavedMode();
     }
 
-    private boolean canSetToSilentMode() {
+    private boolean canSetToWorkMode() {
         return nowIsWithinWorkHours() && isActivated() && nowIsAWorkDay();
     }
 
-    private boolean canSetToNormalMode() {
+    private boolean canSetToOffWorkMode() {
         return nowIsAfterWorkHours() && isActivated() && nowIsAWorkDay();
     }
 

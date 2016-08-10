@@ -109,10 +109,10 @@ public class MainPresenterImpl implements MainPresenter {
         } else if (workDaySet.isEmpty()) {
             mainView.displayErrorOnMissingWorkDays();
         } else {
-                workModeService.activate();
-                workModeAlarm.startAlarm(startTime, endTime);
-                mainView.onWorkModeActivation();
-                mainView.displayActivationSuccessful();
+            workModeService.activate();
+            workModeAlarm.startAlarm(startTime, endTime);
+            mainView.onWorkModeActivation();
+            mainView.displayActivationSuccessful();
         }
     }
 

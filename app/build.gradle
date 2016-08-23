@@ -25,6 +25,10 @@ android {
             resValue 'string', 'home_banner_ad_unit_id', getAdMobHomeBannerIdDebug()
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 def getAdMobHomeBannerIdDebug() {

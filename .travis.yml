@@ -14,6 +14,8 @@ android:
 
 jdk:
   - oraclejdk7
+  - openjdk7
+  - oraclejdk8
 
 script:
   - ./gradlew build connectedCheck

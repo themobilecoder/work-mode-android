@@ -9,7 +9,10 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = MainActivityModule.class)
+@Component(modules = {
+        AndroidModule.class,
+        MainActivityModule.class
+})
 public interface MainActivityComponent {
     void inject(MainActivity mainScreenActivity);
     void inject(WorkModeAlarmReceiver workModeAlarmReceiver);

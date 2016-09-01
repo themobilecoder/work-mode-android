@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
@@ -46,17 +46,14 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @BindView(R.id.enable_button)
     SwitchCompat switchButton;
 
-    @BindView(R.id.work_mode_status_value)
-    TextView workModeStatus;
+    @BindView(R.id.start_time_view)
+    RelativeLayout startTimeView;
 
-    @BindView(R.id.set_start_time_button)
-    ImageView startTimeButton;
+    @BindView(R.id.end_time_view)
+    RelativeLayout endTimeView;
 
-    @BindView(R.id.set_end_time_button)
-    ImageView endTimeButton;
-
-    @BindView(R.id.set_days_button)
-    ImageView setDaysButton;
+    @BindView(R.id.work_days_view)
+    RelativeLayout workDaysView;
 
     @BindView(R.id.work_start_time_value)
     TextView workStartTimeText;
@@ -165,17 +162,17 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
         }
     }
 
-    @OnClick(R.id.set_start_time_button)
-    public void setStartTime(View button) {
+    @OnClick(R.id.start_time_view)
+    public void setStartTime() {
         showTimePickerDialog("startTime");
     }
 
-    @OnClick(R.id.set_end_time_button)
-    public void setEndTime(View button) {
+    @OnClick(R.id.end_time_view)
+    public void setEndTime() {
         showTimePickerDialog("endTime");
     }
 
-    @OnClick(R.id.set_days_button)
+    @OnClick(R.id.work_days_view)
     public void setDays(View button) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -210,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
         LayoutInflater inflater = this.getLayoutInflater();
         final View overrideModeDialog = inflater.inflate(R.layout.override_mode_spinner, null);
         dialogBuilder.setView(overrideModeDialog);
-        dialogBuilder.setTitle("Override Audio Mode");
+        dialogBuilder.setTitle("Override Audio Settings");
 
         final OverrideAudioSpinnerViewHolder audioSpinnerViewHolder = new OverrideAudioSpinnerViewHolder(overrideModeDialog);
         dialogBuilder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
@@ -229,14 +226,10 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     }
 
     private void setViewToDeactivated() {
-        workModeStatus.setText("Disabled");
-        workModeStatus.setTextColor(getResources().getColor(R.color.red));
         switchButton.setChecked(false);
     }
 
     private void setViewToActivated() {
-        workModeStatus.setText("Enabled");
-        workModeStatus.setTextColor(getResources().getColor(R.color.green));
         switchButton.setChecked(true);
     }
 

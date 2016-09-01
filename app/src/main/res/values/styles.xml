@@ -8,11 +8,4 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- Base application theme. -->
-    <style name="MySwitch" parent="AppTheme">
-        <!-- Customize your theme here. -->
-        <item name="colorSwitchThumbNormal">@color/radial_gray_light</item>
-        <item name="colorControlActivated">@color/green</item>
-    </style>
-
 </resources>

@@ -3,13 +3,12 @@ package com.rafaelkarlo.workmode.mainscreen.view;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -68,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
     @BindView(R.id.work_days_value)
     TextView workDaysValue;
 
+    @BindView(R.id.audio_override_button)
+    FloatingActionButton audioOverrideButton;
+
     @BindView(R.id.adView)
     AdView adView;
 
@@ -82,23 +84,6 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
 
         loadAdbanner();
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        switch (itemId) {
-            case R.id.override_mode_menu_item:
-                overrideAudioMode();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -213,6 +198,11 @@ public class MainActivity extends AppCompatActivity implements MainView, RadialT
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.red));
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.red));
+    }
+
+    @OnClick(R.id.audio_override_button)
+    public void onAudioOverrideButtonClick() {
+        overrideAudioMode();
     }
 
     private void overrideAudioMode() {

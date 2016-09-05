@@ -11,7 +11,7 @@ import dagger.Component;
 @Singleton
 @Component(modules = {
         AndroidModule.class,
-        MainActivityModule.class
+        WorkModeModule.class
 })
 public interface MainActivityComponent {
     void inject(MainActivity mainScreenActivity);

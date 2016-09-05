@@ -5,7 +5,7 @@ import android.app.Application;
 import com.rafaelkarlo.workmode.mainscreen.config.AndroidModule;
 import com.rafaelkarlo.workmode.mainscreen.config.DaggerMainActivityComponent;
 import com.rafaelkarlo.workmode.mainscreen.config.MainActivityComponent;
-import com.rafaelkarlo.workmode.mainscreen.config.MainActivityModule;
+import com.rafaelkarlo.workmode.mainscreen.config.WorkModeModule;
 
 public class MainApplication extends Application {
 
@@ -16,7 +16,7 @@ public class MainApplication extends Application {
         super.onCreate();
         mainActivityComponent = DaggerMainActivityComponent.builder()
                 .androidModule(new AndroidModule(this))
-                .mainActivityModule(new MainActivityModule())
+                .workModeModule(new WorkModeModule())
                 .build();
     }
 

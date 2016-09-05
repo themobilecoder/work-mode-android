@@ -24,7 +24,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class MainActivityModule {
+public class WorkModeModule {
 
     @Provides
     @Singleton
